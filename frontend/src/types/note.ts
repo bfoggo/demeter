@@ -1,4 +1,4 @@
-class Note {
+export class Note {
     num: number;
     octave: number;
 
@@ -19,10 +19,15 @@ class Note {
     frequency(tempermant = 'equal') {
         return frequency(this, getTempermant(tempermant));
     }
+
+    pianoColor() {
+        const blackNotes = [1, 3, 6, 8, 10];
+        return blackNotes.includes(this.num) ? 'black' : 'white';
+    }
   
 }
 
-enum Tempermant {
+export enum Tempermant {
     Equal = 'equal',
 }
 
