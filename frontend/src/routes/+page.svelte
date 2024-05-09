@@ -1,6 +1,7 @@
 <script lang="ts">
+    const numOctaves = 2;
+    let numKeys = 12 * numOctaves;
     const keyNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-    let numKeys = keyNames.length;
     const keyColors = ['white', 'black', 'white', 'black', 'white', 'white', 'black', 'white', 'black', 'white', 'black', 'white']
     const numBeats = 16;
     const beatWidth = 20;
@@ -41,7 +42,7 @@
 <div style="display:flex; justify-content: flex-start">
     <div class="keyboard" style="grid-template-rows: repeat({numKeys}, {keyHeight}px); margin-right: 5px;">
         {#each Array.from({ length: numKeys }, (_, i) => i) as key}
-            <div class="key" style="height: {keyHeight}px; width: 20px; background-color: {keyColors[key]}">
+            <div class="key" style="height: {keyHeight}px; width: 20px; background-color: {keyColors[key % 12]}">
             </div>
         {/each}
     </div>
