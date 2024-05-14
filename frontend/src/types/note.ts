@@ -28,12 +28,30 @@ export class Note {
 
     frequency() {
         const a = 440;
-        const n = this.name.valueOf() + (this.octave - 4) * 12;
+        const n = this.name.valueOf() + (this.octave) * 12;
         return Math.pow(2, (n - 57) / 12) * a;
     }
-  
+
+    static allFromOctave(octave: number) {
+        const orderedNotes = [
+            NoteName.C,
+            NoteName.CSharp,
+            NoteName.D,
+            NoteName.DSharp,
+            NoteName.E,
+            NoteName.F,
+            NoteName.FSharp,
+            NoteName.G,
+            NoteName.GSharp,
+            NoteName.A,
+            NoteName.ASharp,
+            NoteName.B
+        ];
+        return orderedNotes.map(name => new Note(name, octave));
+    }
 }
-function PianoColor(note: Note) {
+
+export function pianoColor(note: Note) {
     if (note.name === NoteName.C || note.name === NoteName.D || note.name === NoteName.E || note.name === NoteName.F || note.name === NoteName.G || note.name === NoteName.A || note.name === NoteName.B) {
         return "white";
     } else {

@@ -10,6 +10,8 @@ export enum BeatComplexity {
     Compound,
 }
 
+type ComplexityPattern = BeatComplexity[];
+
 function twosAndThreesSummingToN(n: number): { twos: number, threes: number }[] {
     // All (x,y) such that 2x + 3y = n
     if (n < 2) {
@@ -60,21 +62,28 @@ export class TimeSignature {
         this.denominator = denominator;
     }
 
-    complexityPatters(): BeatComplexity[][] {
+    complexityPatterns(): ComplexityPattern[] {
         switch (this.denominator) {
             case TimeSignatureDenominator.Quarter:
                 return [Array.from({ length: this.numerator }, () => BeatComplexity.Simple)];
             case TimeSignatureDenominator.Eighth:
-                var results: BeatComplexity[][] = []
+                var results: ComplexityPattern[] = []
                 for (const twoThree of twosAndThreesSummingToN(this.numerator)) {
                     const pattern = Array.from({ length: twoThree.twos }, () => BeatComplexity.Simple).concat(Array.from({ length: twoThree.threes }, () => BeatComplexity.Compound));
-                    results.push(...distinguishablePermutations(pattern));
+                    results.push(...distinguishablePermutations(pattern) as ComplexityPattern[]);
                 }
                 return results;
             }
         }
 
+    static allNumerators(): number[] {
+        return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
     }
+
+    static allDenominators(): TimeSignatureDenominator[] {
+        return [TimeSignatureDenominator.Quarter, TimeSignatureDenominator.Eighth];
+    }
+}
 
 
 export class PianoRollGrid {
@@ -84,14 +93,18 @@ export class PianoRollGrid {
     height: number;
 
     constructor(height: number) {
-        this.measures = 4;
+        this.measures = 1;
         this.division = 4;
         this.timeSignature = new TimeSignature(4, TimeSignatureDenominator.Quarter);
         this.height = height;
     }
 
-    get fullWidth() {
-        return this.measures * this.division;
+    get fullWidthInEighths(): number {
+        switch (this.timeSignature.denominator) {
+            case TimeSignatureDenominator.Quarter:
+                return this.measures * this.timeSignature.numerator * 2;
+            case TimeSignatureDenominator.Eighth:
+                return this.measures * this.timeSignature.numerator;
+        }
     }
-
 }

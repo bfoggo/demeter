@@ -1,21 +1,30 @@
 <script lang="ts">
-    import { Note } from '../types/note'
+    import {onMount} from 'svelte'
+    import { Note, pianoColor } from '../types/note'
+    import { PianoRollGrid, TimeSignature, TimeSignatureDenominator } from '../types/pianoRoll'
+    import Dropdown from '../components/dropdown.svelte'
     const numOctaves = 2;
     const startOctave = 4;
-    const numBeats = 16;
-    const beatWidth = 20;
+    const numMeasures = 1;
+    const quarterNoteWidth = 20;
+    let eighthNoteWidth = quarterNoteWidth / 2;
     const keyHeight = 10;
-    const audioContext = new AudioContext();
+    let timeSignatureNumeratorString = '4';
+    let timeSignatureNumerator = parseInt(timeSignatureNumeratorString)
+    let timeSignatureDenominatorString = '4';
+    let timeSignatureDenominator = parseInt(timeSignatureDenominatorString)
 
-    const keys = Array.from({ length: numOctaves * 12 }, (_, i) => new Note(i % 12, Math.floor(i / 12) + startOctave));
+    var audioContext: AudioContext;
+    onMount(() => {
+        audioContext = new AudioContext();
+    })
+
+    const keys = Array.from({ length: numOctaves }, (_, i) => Note.allFromOctave(startOctave + i)).flat();
     let reverseKeys = keys.slice().reverse();
     let numKeys = keys.length;
-    let pianoRoll = Array.from({ length: numKeys }, () => Array.from({ length: numBeats }, () => false));
 
-    function toggleNote(key: number, beat: number) {
-        pianoRoll[key][beat] = !pianoRoll[key][beat];
-        pianoRoll = [...pianoRoll];
-    }
+    let grid = new PianoRollGrid(keys.length)
+
 
     function playNote(note: Note) {
         let oscillator = audioContext.createOscillator();
@@ -34,16 +43,6 @@
         display: grid;
     }
 
-    .piano-roll {
-        display: grid;
-    }
-
-    .cell{
-        border: 1px solid #ccc;
-        cursor: pointer;
-        margin: 0;
-    }
-
     .key {
         border: 1px solid #ccc;
         cursor: pointer;
@@ -51,22 +50,18 @@
     }
 
 </style>
-<div style="display:flex; justify-content: flex-start">
+<div style="display:flex; justify-content: flex-start; align-items: center;">
+   <p style="margin-right: 5px;">Time signature:</p>
+    <Dropdown options={TimeSignature.allNumerators().map(String)} defaultOption={'4'} bind:selected={timeSignatureNumeratorString} />
+    <p style="margin-right: 5px; margin-left: 5px">/</p>
+    <Dropdown options={TimeSignature.allDenominators().map(String)} defaultOption={'4'}/>
+</div>
+<div style="display:flex; justify-content: flex-start; align-items: center;">
     <div class="keyboard" style="grid-template-rows: repeat({numKeys}, {keyHeight}px); margin-right: 5px;">
         {#each reverseKeys as key, keyIndex}
-            <button type="button" class="key" style="height: {keyHeight}px; width: 20px; background-color: {key.pianoColor()}"
+            <button type="button" class="key" style="height: {keyHeight}px; width: 20px; background-color: {pianoColor(key)}"
                 on:click={() => playNote(key)}> 
             </button>
-        {/each}
-    </div>
-    <div class="piano-roll" style="grid-template-columns: repeat({numBeats}, {beatWidth}px)">
-        {#each pianoRoll as key, keyIndex}
-            {#each key as beat, beatIndex}
-                <button type="button" class="cell" style="width: {beatWidth}px; height: {keyHeight}px; 
-                background-color: {pianoRoll[keyIndex][beatIndex] ? 'black' : 'white'}"
-                    on:click={() => toggleNote(keyIndex, beatIndex)}>
-                </button>
-            {/each}
         {/each}
     </div>
 </div>
