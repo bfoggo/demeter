@@ -10,63 +10,38 @@ export enum BeatComplexity {
     Compound,
 }
 
-class TwosAndThrees {
-    twos: number;
-    threes: number;
-
-    constructor(twos: number, threes: number) {
-        this.twos = twos;
-        this.threes = threes;
-    }
-
-    permutations(): number[][] {
-        if (this.twos === 0 && this.threes === 0) {
-            return [];
-        }
-        if (this.twos === 0) {
-            return Array.from({ length: this.threes }, () => [3]);
-        }
-        if (this.threes === 0) {
-            return Array.from({ length: this.twos }, () => [2]);
-        }
-        var elements = Array.from({ length: this.twos + this.threes }, (_, i) => i < this.twos ? 2 : 3);
-        var results = [];
-        for (let i = 0; i < this.twos + this.threes; i++) {
-            var subElements = elements.slice();
-            subElements.splice(i, 1);
-            var subTwoThree
-            if (elements[i] === 2) {
-                subTwoThree = new TwosAndThrees(this.twos - 1, this.threes);
-            } else {
-                subTwoThree = new TwosAndThrees(this.twos, this.threes - 1);
-            }
-            var subPermutations = subTwoThree.permutations();
-            for (let j = 0; j < subPermutations.length; j++) {
-                for (let k = 0; k < subPermutations[j].length; k++) {
-                    var newResult = subPermutations[j].splice(k, 0, elements[i]);
-                    results.push(newResult);
-                }
-            }
-        }
-        return results;
-    }
-}
-
-function numberOfTwosAndThrees(n: number): { twos: number, threes: number }[] {
-    // all (x, y) such that 2x + 3y = n
+function twosAndThreesSummingToN(n: number): { twos: number, threes: number }[] {
+    // All (x,y) such that 2x + 3y = n
     if (n < 2) {
-        throw new Error("n must be greater than 2");
-    }
-    if (n === 2) {
-        return [{ twos: 1, threes: 0 }];
-    }
-    if (n === 3) {
-        return [{ twos: 0, threes: 1 }];
+        throw new Error("n must be at least 2");
     }
     const results = [];
     for (let i = 0; i <= Math.floor(n / 2); i++) {
         if ((n - 2 * i) % 3 === 0) {
             results.push({ twos: i, threes: (n - 2 * i) / 3 });
+        }
+    }
+    return results;
+}
+
+function distinguishablePermutations(symbols: any[]): any[][] {
+    if (symbols.length === 0) {
+        return [[]]
+    }
+    if (symbols.length === 1) {
+        return [symbols];
+    }
+    const results: any[][] = [];
+    for (let i = 0; i < symbols.length; i++) {
+        const rest = [...symbols];
+        rest.splice(i, 1);
+        const restPermutations = distinguishablePermutations(rest);
+        for (const restPermutation of restPermutations) {
+            for (let j = 0; j <= restPermutation.length; j++) {
+                const permutation = [...restPermutation];
+                permutation.splice(j, 0, symbols[i]);
+                results.push(permutation);
+            }
         }
     }
     return results;
@@ -90,15 +65,17 @@ export class TimeSignature {
             case TimeSignatureDenominator.Quarter:
                 return [Array.from({ length: this.numerator }, () => BeatComplexity.Simple)];
             case TimeSignatureDenominator.Eighth:
-            // all of the ways to sum 2 and 3 to get this.numerator
-
-            default:
-                throw new Error("Invalid time signature denominator");
+                var results: BeatComplexity[][] = []
+                for (const twoThree of twosAndThreesSummingToN(this.numerator)) {
+                    const pattern = Array.from({ length: twoThree.twos }, () => BeatComplexity.Simple).concat(Array.from({ length: twoThree.threes }, () => BeatComplexity.Compound));
+                    results.push(...distinguishablePermutations(pattern));
+                }
+                return results;
+            }
         }
 
     }
 
-}
 
 export class PianoRollGrid {
     measures: number;
