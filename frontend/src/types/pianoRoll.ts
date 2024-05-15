@@ -45,7 +45,9 @@ function distinguishablePermutations(symbols: any[]): any[][] {
             for (let j = 0; j <= restPermutation.length; j++) {
                 const permutation = [...restPermutation];
                 permutation.splice(j, 0, symbols[i]);
+                if (!results.find(result => result.join("") === permutation.join(""))) {
                 results.push(permutation);
+                }
             }
         }
     }
@@ -68,7 +70,7 @@ export class TimeSignature {
     complexityPatterns(): ComplexityPattern[] {
         switch (this.denominator) {
             case TimeSignatureDenominator.Quarter:
-                return [Array.from({ length: this.numerator }, () => BeatComplexity.Simple)];
+                return [Array.from({ length: this.numerator }, () => BeatComplexity.Simple)] as ComplexityPattern[];
             case TimeSignatureDenominator.Eighth:
                 var results: ComplexityPattern[] = []
                 for (const twoThree of twosAndThreesSummingToN(this.numerator)) {
