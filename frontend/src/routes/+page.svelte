@@ -23,9 +23,8 @@
         timeSignatureNumerator,
         timeSignatureDenominator,
     );
-    $: console.log(timeSignature);
     $: complexityPatterns = timeSignature.complexityPatterns().map(beatPatternStr);
-    $: console.log(complexityPatterns);
+    $: defaultBeatPattern = complexityPatterns[0];
 
     var audioContext: AudioContext;
     onMount(() => {
@@ -64,10 +63,12 @@
         bind:selected={timeSignatureDenominatorString}
     />
     <p style="margin-right: 5px; margin-left: 5px;">Beat Pattern</p>
+    {#key defaultBeatPattern}
     <Dropdown
         options={complexityPatterns}
-        defaultOption={"4"}
+        defaultOption={defaultBeatPattern}
     />
+    {/key}
     <p style="margin-right: 5px; margin-left: 5px;">Tempo:</p>
     <input
         type="number"
