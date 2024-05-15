@@ -8,16 +8,15 @@
 </script>
 
 <style>
+
     .dropdown {
         display: flex;
         justify-content: center;
-        height: 20px;
     }
 
     .dropdown-content {
         position: absolute;
         align-items: center;
-        translate: 10px 0px;
         background-color: #f1f1f1;
         box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
         z-index: 1;
@@ -40,13 +39,12 @@
         </button>
     {/each}
 </div>
-{:else}
+{/if}
 
 <button type=button class="dropdown" on:click={() => {isOpen = !isOpen}}>
     {selected}
 </button>
 
-{/if}
 
 </div>
 
