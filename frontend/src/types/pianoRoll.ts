@@ -11,6 +11,9 @@ export enum BeatComplexity {
 }
 
 type ComplexityPattern = BeatComplexity[];
+export function beatPatternStr(pattern: ComplexityPattern): string {
+    return pattern.map(beat => beat === BeatComplexity.Simple ? "S" : "C").join("");
+}
 
 function twosAndThreesSummingToN(n: number): { twos: number, threes: number }[] {
     // All (x,y) such that 2x + 3y = n
@@ -73,8 +76,8 @@ export class TimeSignature {
                     results.push(...distinguishablePermutations(pattern) as ComplexityPattern[]);
                 }
                 return results;
-            }
         }
+    }
 
     static allNumerators(): number[] {
         return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
