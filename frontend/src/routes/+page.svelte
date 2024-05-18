@@ -11,11 +11,11 @@
     import Dropdown from "../components/dropdown.svelte";
     const numOctaves = 2;
     const startOctave = 4;
-    const keyHeight = 10;
+    const keyHeight = 20;
     const keys = Array.from({ length: numOctaves }, (_, i) =>
         Note.allFromOctave(startOctave + i),
     ).flat();
-    let grid = new PianoRollGrid(1, keys.length, keyHeight, 20 );
+    let grid = new PianoRollGrid(1, keys.length, keyHeight, 50 );
 
     let timeSignatureNumeratorString = "4";
     let timeSignatureDenominatorString = "4";
@@ -90,7 +90,7 @@
             <button
                 type="button"
                 class="key"
-                style="height: {keyHeight}px; width: 20px; background-color: {pianoColor(
+                style="height: {keyHeight}px; width: 30px; background-color: {pianoColor(
                     key,
                 )}"
                 on:click={() => playNote(key)}
@@ -110,6 +110,12 @@
                 class="minorLine"
                 style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px; z-index: -1;"
             ></div>
+        {/each}
+        {#each reverseKeys as key, keyIndex}
+            <div
+                class="minorLine"
+                style="position: absolute; width: {grid.totalWidth(timeSignature)}px; height: 1px; top: {keyIndex * keyHeight}px; z-index: -1;">
+            </div>
         {/each}
      </div>
 
