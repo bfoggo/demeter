@@ -4,9 +4,9 @@
     import {
         PianoRollGrid,
         TimeSignature,
-        TimeSignatureDenominator,
         parseBeatPatternString,
         beatPatternStr,
+        Division
     } from "../types/pianoRoll";
     import Dropdown from "../components/dropdown.svelte";
     const numOctaves = 2;
@@ -34,9 +34,8 @@
         timeSignature,
         parseBeatPatternString(complexityPattern),
     );
-    $: minorLines = grid.minorLinesPosX(timeSignature);
+    $: minorLines = grid.minorLinesPosX(timeSignature, Division.Quarter);
     $: measureLines = grid.measureLinesPosX(timeSignature);
-    $: console.log(majorLines, minorLines, measureLines);
 
     var audioContext: AudioContext;
     onMount(() => {
@@ -162,7 +161,9 @@
         background-color: #000000;
     }
     .majorLine {
-        background-color: #555454;
+        border-left-style: dashed;
+        border-width: 2px;
+        border-color: #00851660;
     }
     .minorLine {
         background-color: #a8a8a8;

@@ -10,6 +10,15 @@ export enum BeatComplexity {
     Compound,
 }
 
+export enum Division {
+    Whole,
+    Half,
+    Quarter,
+    Eighth,
+    Sixteenth,
+    ThirtySecond,
+}
+
 type ComplexityPattern = BeatComplexity[];
 
 
@@ -89,6 +98,23 @@ export class TimeSignature {
         }
     }
 
+    numDivisionsPerMeasure(division: Division): number {
+        switch (division) {
+            case Division.Whole:
+                return this.numerator / this.denominator;
+            case Division.Half:
+                return 2 * this.numerator / this.denominator;
+            case Division.Quarter:
+                return 4 * this.numerator / this.denominator;
+            case Division.Eighth:
+                return 8 * this.numerator / this.denominator;
+            case Division.Sixteenth:
+                return 16 * this.numerator / this.denominator;
+            case Division.ThirtySecond:
+                return 32 * this.numerator / this.denominator;
+        }
+    }
+
     static allNumerators(): number[] {
         return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
     }
@@ -154,12 +180,29 @@ export class PianoRollGrid {
         return gridLinesAllMeasures;
     }
 
-    minorLinesPosX(timeSignature: TimeSignature): number[] {
+    divisionLength(division: Division): number {
+        switch (division) {
+            case Division.Whole:
+                return 8 * this.eighthNoteWidth;
+            case Division.Half:
+                return 4 * this.eighthNoteWidth;
+            case Division.Quarter:
+                return 2 * this.eighthNoteWidth;
+            case Division.Eighth:
+                return this.eighthNoteWidth;
+            case Division.Sixteenth:
+                return this.eighthNoteWidth / 2;
+            case Division.ThirtySecond:
+                return this.eighthNoteWidth / 4;
+        }
+    }
+
+    minorLinesPosX(timeSignature: TimeSignature, division: Division): number[] {
         const gridLines = [];
         let current = 0;
-        for (let i = 0; i < this.measures * timeSignature.numerator; i++) {
+        for (let i = 0; i < this.measures * timeSignature.numDivisionsPerMeasure(division); i++) {
             gridLines.push(current);
-            current += timeSignature.denominator === TimeSignatureDenominator.Quarter ? 2 * this.eighthNoteWidth : this.eighthNoteWidth;
+            current += this.divisionLength(division);
         }
         gridLines.push(current);
         return gridLines;
