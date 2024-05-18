@@ -48,6 +48,8 @@
     );
     $: minorLines = grid.minorLinesPosX(timeSignature, Division.Quarter);
     $: measureLines = grid.measureLinesPosX(timeSignature);
+    $: console.log(timeSignature)
+    $: console.log(grid)
 
     var audioContext: AudioContext;
     onMount(() => {
@@ -68,24 +70,26 @@
 </script>
 
 <div>
-    <div class="flex ml-2">
-        <div class="rounded flex items-center bg-gray-200 px-2 text-sm">
+    <div class="flex ml-2 mt-2">
+        <div class="rounded flex items-center px-2 text-sm">
             Time signature
             <Select
                 items={TimeSignature.allNumerators().map((n) => {
                     return { value: n, name: n };
                 })}
                 bind:value={timeSignatureNumeratorString}
-                placeholder="numerator"
-                class="w-24 ml-2 space-y-1 bg-gray-200 justify-center"
+                placeholder=""
+                class="w-24 ml-2 space-y-1 bg-gray-300 justify-center"
+                size="sm"
             />
             <Select
                 items={TimeSignature.allDenominators().map((n) => {
                     return { value: n, name: n };
                 })}
                 bind:value={timeSignatureDenominatorString}
-                placeholder="denominator"
-                class="w-24 bg-gray-200"
+                placeholder=""
+                class="w-24 bg-gray-300"
+                size="sm"
             />
             <Select
                 items={complexityPatterns.map((n) => {
@@ -93,7 +97,9 @@
                 })}
                 bind:value={complexityPattern}
                 placeholder="pattern"
-                class="bg-gray-200"/>
+                class="bg-gray-300"
+                size="sm"
+                />
 
         </div>
 
@@ -111,7 +117,7 @@
     </div>
 
     <div
-        style="display:flex; justify-content: flex-start; align-items: center;"
+        class="flex ml-2"
     >
         <div
             class="keyboard"
@@ -190,6 +196,7 @@
     }
     .majorLine {
         border-left-style: dashed;
+        border-right: none;
         border-width: 2px;
         border-color: #00851660;
     }
