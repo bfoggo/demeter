@@ -11,6 +11,8 @@ export enum BeatComplexity {
 }
 
 type ComplexityPattern = BeatComplexity[];
+
+
 export function beatPatternStr(pattern: ComplexityPattern): string {
     return pattern.map(beat => beat === BeatComplexity.Simple ? "S" : "C").join("");
 }
@@ -18,7 +20,6 @@ export function parseBeatPatternString(patternStr: string): ComplexityPattern {
     if (patternStr === undefined || patternStr === null || patternStr === "") {
         return [];
     }
-    console.log(patternStr);
     return patternStr.split("").map(char => char === "S" ? BeatComplexity.Simple : BeatComplexity.Compound);
 }
 
@@ -53,7 +54,7 @@ function distinguishablePermutations(symbols: any[]): any[][] {
                 const permutation = [...restPermutation];
                 permutation.splice(j, 0, symbols[i]);
                 if (!results.find(result => result.join("") === permutation.join(""))) {
-                results.push(permutation);
+                    results.push(permutation);
                 }
             }
         }
@@ -111,8 +112,17 @@ export class PianoRollGrid {
         this.eighthNoteWidth = eighthNoteWidth;
     }
 
-    setMeasures(measures: number)  {
+    setMeasures(measures: number) {
         this.measures = measures;
+    }
+
+    measureWidth(timeSignature: TimeSignature): number {
+        switch (timeSignature.denominator) {
+            case TimeSignatureDenominator.Quarter:
+                return timeSignature.numerator * 2 * this.eighthNoteWidth;
+            case TimeSignatureDenominator.Eighth:
+                return timeSignature.numerator * this.eighthNoteWidth;
+        }
     }
 
     totalWidth(timeSignature: TimeSignature): number {
@@ -128,8 +138,8 @@ export class PianoRollGrid {
         return this.numKeys * this.keyHeight;
     }
 
-    majorLinesPosX(complexityPattern: ComplexityPattern): number[] {
-        const gridLines = [];
+    majorLinesPosX(timeSignature: TimeSignature, complexityPattern: ComplexityPattern): number[] {
+        var gridLines: number[] = [];
         let current = 0;
         for (const complexity of complexityPattern) {
             gridLines.push(current);
@@ -140,7 +150,8 @@ export class PianoRollGrid {
             }
         }
         gridLines.push(current);
-        return gridLines;
+        let gridLinesAllMeasures = Array.from({ length: this.measures }, (_, i) => i).map(i => gridLines.map(l => l + i * this.measureWidth(timeSignature))).flat();
+        return gridLinesAllMeasures;
     }
 
     minorLinesPosX(timeSignature: TimeSignature): number[] {
@@ -149,10 +160,20 @@ export class PianoRollGrid {
         for (let i = 0; i < this.measures * timeSignature.numerator; i++) {
             gridLines.push(current);
             current += timeSignature.denominator === TimeSignatureDenominator.Quarter ? 2 * this.eighthNoteWidth : this.eighthNoteWidth;
-            gridLines.push(current);
         }
+        gridLines.push(current);
         return gridLines;
+    }
 
+    measureLinesPosX(timeSignature: TimeSignature): number[] {
+        const gridLines = [];
+        let current = 0;
+        for (let i = 0; i < this.measures; i++) {
+            gridLines.push(current);
+            current += timeSignature.denominator === TimeSignatureDenominator.Quarter ? timeSignature.numerator * 2 * this.eighthNoteWidth : timeSignature.numerator * this.eighthNoteWidth;
+        }
+        gridLines.push(current);
+        return gridLines;
     }
 
 }

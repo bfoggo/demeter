@@ -15,7 +15,7 @@
     const keys = Array.from({ length: numOctaves }, (_, i) =>
         Note.allFromOctave(startOctave + i),
     ).flat();
-    let grid = new PianoRollGrid(1, keys.length, keyHeight, 50 );
+    let grid = new PianoRollGrid(2, keys.length, keyHeight, 50);
 
     let timeSignatureNumeratorString = "4";
     let timeSignatureDenominatorString = "4";
@@ -25,18 +25,24 @@
         timeSignatureNumerator,
         timeSignatureDenominator,
     );
-    $: complexityPatterns = timeSignature.complexityPatterns().map(beatPatternStr);
+    $: complexityPatterns = timeSignature
+        .complexityPatterns()
+        .map(beatPatternStr);
     $: defaultBeatPattern = complexityPatterns[0];
     $: complexityPattern = defaultBeatPattern;
-    $: majorLines = grid.majorLinesPosX(parseBeatPatternString(complexityPattern))
-    $: minorLines = grid.minorLinesPosX(timeSignature)
-
+    $: majorLines = grid.majorLinesPosX(
+        timeSignature,
+        parseBeatPatternString(complexityPattern),
+    );
+    $: minorLines = grid.minorLinesPosX(timeSignature);
+    $: measureLines = grid.measureLinesPosX(timeSignature);
+    $: console.log(majorLines, minorLines, measureLines);
 
     var audioContext: AudioContext;
     onMount(() => {
         audioContext = new AudioContext();
     });
-    
+
     let reverseKeys = keys.slice().reverse();
     let numKeys = keys.length;
 
@@ -65,11 +71,11 @@
     />
     <p style="margin-right: 5px; margin-left: 5px;">Beat Pattern</p>
     {#key defaultBeatPattern}
-    <Dropdown
-        options={complexityPatterns}
-        defaultOption={defaultBeatPattern}
-        bind:selected={complexityPattern}
-    />
+        <Dropdown
+            options={complexityPatterns}
+            defaultOption={defaultBeatPattern}
+            bind:selected={complexityPattern}
+        />
     {/key}
     <p style="margin-right: 5px; margin-left: 5px;">Tempo:</p>
     <input
@@ -98,13 +104,18 @@
             </button>
         {/each}
     </div>
-    <div class="gridBackground" style="position: relative; height: {grid.totalHeight()}px; width: {grid.totalWidth(timeSignature)}px">
+    <div
+        class="gridBackground"
+        style="position: relative; height: {grid.totalHeight()}px; width: {grid.totalWidth(
+            timeSignature,
+        )}px"
+    >
         {#each majorLines as posX, i}
-             <div
-                 class="majorLine"
-                 style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
-             ></div>
-         {/each}
+            <div
+                class="majorLine"
+                style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
+            ></div>
+        {/each}
         {#each minorLines as posX, i}
             <div
                 class="minorLine"
@@ -114,12 +125,23 @@
         {#each reverseKeys as key, keyIndex}
             <div
                 class="minorLine"
-                style="position: absolute; width: {grid.totalWidth(timeSignature)}px; height: 1px; top: {keyIndex * keyHeight}px; z-index: -1;">
-            </div>
+                style="position: absolute; width: {grid.totalWidth(
+                    timeSignature,
+                )}px; height: 1px; top: {keyIndex * keyHeight}px; z-index: -1;"
+            ></div>
         {/each}
-     </div>
-
-        
+        {#each measureLines as posX, i}
+            <div
+                class="measureLine"
+                style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX}px; z-index: 1;"
+            ></div>
+            <div
+                class="measureLine"
+                style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX +
+                    3}px; z-index: 1;"
+            ></div>
+        {/each}
+    </div>
 </div>
 
 <style>
@@ -136,8 +158,11 @@
         background-color: #d1cbcb;
         z-index: 1;
     }
-    .majorLine {
+    .measureLine{
         background-color: #000000;
+    }
+    .majorLine {
+        background-color: #555454;
     }
     .minorLine {
         background-color: #a8a8a8;
