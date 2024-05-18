@@ -14,6 +14,12 @@ type ComplexityPattern = BeatComplexity[];
 export function beatPatternStr(pattern: ComplexityPattern): string {
     return pattern.map(beat => beat === BeatComplexity.Simple ? "S" : "C").join("");
 }
+export function parseBeatPatternString(patternStr: string): ComplexityPattern {
+    if (patternStr === undefined || patternStr === null || patternStr === "") {
+        return [];
+    }
+    return patternStr.split("").map(char => char === "S" ? BeatComplexity.Simple : BeatComplexity.Compound);
+}
 
 function twosAndThreesSummingToN(n: number): { twos: number, threes: number }[] {
     // All (x,y) such that 2x + 3y = n
@@ -93,23 +99,47 @@ export class TimeSignature {
 
 export class PianoRollGrid {
     measures: number;
-    timeSignature: TimeSignature;
-    division: number;
-    height: number;
+    numKeys: number;
+    keyHeight: number;
+    eighthNoteWidth: number;
 
-    constructor(height: number) {
-        this.measures = 1;
-        this.division = 4;
-        this.timeSignature = new TimeSignature(4, TimeSignatureDenominator.Quarter);
-        this.height = height;
+    constructor(measures: number, numKeys: number, keyHeight: number, eighthNoteWidth: number) {
+        this.measures = measures;
+        this.numKeys = numKeys;
+        this.keyHeight = keyHeight;
+        this.eighthNoteWidth = eighthNoteWidth;
     }
 
-    get fullWidthInEighths(): number {
-        switch (this.timeSignature.denominator) {
+    setMeasures(measures: number)  {
+        this.measures = measures;
+    }
+
+    totalWidth(timeSignature: TimeSignature): number {
+        switch (timeSignature.denominator) {
             case TimeSignatureDenominator.Quarter:
-                return this.measures * this.timeSignature.numerator * 2;
+                return this.measures * timeSignature.numerator * 2 * this.eighthNoteWidth;
             case TimeSignatureDenominator.Eighth:
-                return this.measures * this.timeSignature.numerator;
+                return this.measures * timeSignature.numerator * this.eighthNoteWidth;
         }
     }
+
+    totalHeight(): number {
+        return this.numKeys * this.keyHeight;
+    }
+
+    majorLinesPosX(complexityPattern: ComplexityPattern): number[] {
+        const gridLines = [];
+        let current = 0;
+        for (const complexity of complexityPattern) {
+            gridLines.push(current);
+            if (complexity === BeatComplexity.Simple) {
+                current += 2 * this.eighthNoteWidth;
+            } else {
+                current += 3 * this.eighthNoteWidth;
+            }
+        }
+        gridLines.push(current);
+        return gridLines;
+    }
+
 }

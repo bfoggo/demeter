@@ -5,18 +5,20 @@
         PianoRollGrid,
         TimeSignature,
         TimeSignatureDenominator,
+        parseBeatPatternString,
         beatPatternStr,
     } from "../types/pianoRoll";
     import Dropdown from "../components/dropdown.svelte";
     const numOctaves = 2;
     const startOctave = 4;
-    const numMeasures = 1;
-    const quarterNoteWidth = 20;
     const keyHeight = 10;
+    const keys = Array.from({ length: numOctaves }, (_, i) =>
+        Note.allFromOctave(startOctave + i),
+    ).flat();
+    let grid = new PianoRollGrid(1, keys.length, keyHeight, 20 );
+
     let timeSignatureNumeratorString = "4";
     let timeSignatureDenominatorString = "4";
-
-    $: eighthNoteWidth = quarterNoteWidth / 2;
     $: timeSignatureNumerator = parseInt(timeSignatureNumeratorString);
     $: timeSignatureDenominator = parseInt(timeSignatureDenominatorString);
     $: timeSignature = new TimeSignature(
@@ -25,19 +27,16 @@
     );
     $: complexityPatterns = timeSignature.complexityPatterns().map(beatPatternStr);
     $: defaultBeatPattern = complexityPatterns[0];
+    $: complexityPattern = defaultBeatPattern;
+
 
     var audioContext: AudioContext;
     onMount(() => {
         audioContext = new AudioContext();
     });
-
-    const keys = Array.from({ length: numOctaves }, (_, i) =>
-        Note.allFromOctave(startOctave + i),
-    ).flat();
+    
     let reverseKeys = keys.slice().reverse();
     let numKeys = keys.length;
-
-    let grid = new PianoRollGrid(keys.length);
 
     function playNote(note: Note) {
         let oscillator = audioContext.createOscillator();
@@ -67,6 +66,7 @@
     <Dropdown
         options={complexityPatterns}
         defaultOption={defaultBeatPattern}
+        bind:selected={complexityPattern}
     />
     {/key}
     <p style="margin-right: 5px; margin-left: 5px;">Tempo:</p>
@@ -96,6 +96,16 @@
             </button>
         {/each}
     </div>
+    <div class="gridBackground" style="display: flex; height: {grid.totalHeight()}px;">
+        {#each grid.majorLinesPosX(parseBeatPatternString(complexityPattern)) as posX, i}
+             <div
+                 class="majorLine"
+                 style="position: relative; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
+             ></div>
+         {/each}
+     </div>
+
+        
 </div>
 
 <style>
@@ -107,5 +117,12 @@
         border: 1px solid #ccc;
         cursor: pointer;
         margin: 0;
+    }
+    .gridBackground {
+        background-color: #f1f1f1;
+        z-index: 1;
+    }
+    .majorLine {
+        background-color: #000000;
     }
 </style>
