@@ -18,6 +18,7 @@ export function parseBeatPatternString(patternStr: string): ComplexityPattern {
     if (patternStr === undefined || patternStr === null || patternStr === "") {
         return [];
     }
+    console.log(patternStr);
     return patternStr.split("").map(char => char === "S" ? BeatComplexity.Simple : BeatComplexity.Compound);
 }
 
@@ -140,6 +141,18 @@ export class PianoRollGrid {
         }
         gridLines.push(current);
         return gridLines;
+    }
+
+    minorLinesPosX(timeSignature: TimeSignature): number[] {
+        const gridLines = [];
+        let current = 0;
+        for (let i = 0; i < this.measures * timeSignature.numerator; i++) {
+            gridLines.push(current);
+            current += timeSignature.denominator === TimeSignatureDenominator.Quarter ? 2 * this.eighthNoteWidth : this.eighthNoteWidth;
+            gridLines.push(current);
+        }
+        return gridLines;
+
     }
 
 }

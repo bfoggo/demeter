@@ -29,6 +29,7 @@
     $: defaultBeatPattern = complexityPatterns[0];
     $: complexityPattern = defaultBeatPattern;
     $: majorLines = grid.majorLinesPosX(parseBeatPatternString(complexityPattern))
+    $: minorLines = grid.minorLinesPosX(timeSignature)
 
 
     var audioContext: AudioContext;
@@ -97,13 +98,19 @@
             </button>
         {/each}
     </div>
-    <div class="gridBackground" style="display: flex; height: {grid.totalHeight()}px; width: {grid.totalWidth(timeSignature) + majorLines.length}px">
+    <div class="gridBackground" style="position: relative; height: {grid.totalHeight()}px; width: {grid.totalWidth(timeSignature)}px">
         {#each majorLines as posX, i}
              <div
                  class="majorLine"
-                 style="position: relative; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
+                 style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
              ></div>
          {/each}
+        {#each minorLines as posX, i}
+            <div
+                class="minorLine"
+                style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px; z-index: -1;"
+            ></div>
+        {/each}
      </div>
 
         
@@ -125,5 +132,8 @@
     }
     .majorLine {
         background-color: #000000;
+    }
+    .minorLine {
+        background-color: #a8a8a8;
     }
 </style>
