@@ -28,6 +28,7 @@
     $: complexityPatterns = timeSignature.complexityPatterns().map(beatPatternStr);
     $: defaultBeatPattern = complexityPatterns[0];
     $: complexityPattern = defaultBeatPattern;
+    $: majorLines = grid.majorLinesPosX(parseBeatPatternString(complexityPattern))
 
 
     var audioContext: AudioContext;
@@ -96,8 +97,8 @@
             </button>
         {/each}
     </div>
-    <div class="gridBackground" style="display: flex; height: {grid.totalHeight()}px;">
-        {#each grid.majorLinesPosX(parseBeatPatternString(complexityPattern)) as posX, i}
+    <div class="gridBackground" style="display: flex; height: {grid.totalHeight()}px; width: {grid.totalWidth(timeSignature) + majorLines.length}px">
+        {#each majorLines as posX, i}
              <div
                  class="majorLine"
                  style="position: relative; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
@@ -119,7 +120,7 @@
         margin: 0;
     }
     .gridBackground {
-        background-color: #f1f1f1;
+        background-color: #d1cbcb;
         z-index: 1;
     }
     .majorLine {
