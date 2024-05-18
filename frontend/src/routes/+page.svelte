@@ -1,14 +1,26 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { Note, pianoColor } from "../types/note";
+
+    import {
+        Button,
+        Dropdown,
+        Select,
+        DropdownItem,
+        Radio,
+        Kbd,
+        Label,
+    } from "flowbite-svelte";
+
+    import { ChevronDownOutline } from "flowbite-svelte-icons";
+
     import {
         PianoRollGrid,
         TimeSignature,
         parseBeatPatternString,
         beatPatternStr,
-        Division
+        Division,
     } from "../types/pianoRoll";
-    import Dropdown from "../components/dropdown.svelte";
     const numOctaves = 2;
     const startOctave = 4;
     const keyHeight = 20;
@@ -55,91 +67,107 @@
     }
 </script>
 
-<div style="display:flex; justify-content: flex-start; align-items: center;">
-    <p style="margin-right: 5px;">Time signature:</p>
-    <Dropdown
-        options={TimeSignature.allNumerators().map(String)}
-        defaultOption={"4"}
-        bind:selected={timeSignatureNumeratorString}
-    />
-    <p style="margin-right: 5px; margin-left: 5px">/</p>
-    <Dropdown
-        options={TimeSignature.allDenominators().map(String)}
-        defaultOption={"4"}
-        bind:selected={timeSignatureDenominatorString}
-    />
-    <p style="margin-right: 5px; margin-left: 5px;">Beat Pattern</p>
-    {#key defaultBeatPattern}
-        <Dropdown
-            options={complexityPatterns}
-            defaultOption={defaultBeatPattern}
-            bind:selected={complexityPattern}
+<div>
+    <div class="flex ml-2">
+        <div class="rounded flex items-center bg-gray-200 px-2 text-sm">
+            Time signature
+            <Select
+                items={TimeSignature.allNumerators().map((n) => {
+                    return { value: n, name: n };
+                })}
+                bind:value={timeSignatureNumeratorString}
+                placeholder="numerator"
+                class="w-24 ml-2 space-y-1 bg-gray-200 justify-center"
+            />
+            <Select
+                items={TimeSignature.allDenominators().map((n) => {
+                    return { value: n, name: n };
+                })}
+                bind:value={timeSignatureDenominatorString}
+                placeholder="denominator"
+                class="w-24 bg-gray-200"
+            />
+            <Select
+                items={complexityPatterns.map((n) => {
+                    return { value: n, name: n };
+                })}
+                bind:value={complexityPattern}
+                placeholder="pattern"
+                class="bg-gray-200"/>
+
+        </div>
+
+        <Kbd class="px-2 py-1.5" style="margin-right: 5px; margin-left: 5px;"
+            >Tempo:</Kbd
+        >
+        <input
+            type="number"
+            min="1"
+            max="300"
+            step="1"
+            value="120"
+            style="width: 50px;"
         />
-    {/key}
-    <p style="margin-right: 5px; margin-left: 5px;">Tempo:</p>
-    <input
-        type="number"
-        min="1"
-        max="300"
-        step="1"
-        value="120"
-        style="width: 50px;"
-    />
-</div>
-<div style="display:flex; justify-content: flex-start; align-items: center;">
-    <div
-        class="keyboard"
-        style="grid-template-rows: repeat({numKeys}, {keyHeight}px); margin-right: 5px;"
-    >
-        {#each reverseKeys as key, keyIndex}
-            <button
-                type="button"
-                class="key"
-                style="height: {keyHeight}px; width: 30px; background-color: {pianoColor(
-                    key,
-                )}"
-                on:click={() => playNote(key)}
-            >
-            </button>
-        {/each}
     </div>
+
     <div
-        class="gridBackground"
-        style="position: relative; height: {grid.totalHeight()}px; width: {grid.totalWidth(
-            timeSignature,
-        )}px"
+        style="display:flex; justify-content: flex-start; align-items: center;"
     >
-        {#each majorLines as posX, i}
-            <div
-                class="majorLine"
-                style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
-            ></div>
-        {/each}
-        {#each minorLines as posX, i}
-            <div
-                class="minorLine"
-                style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px; z-index: -1;"
-            ></div>
-        {/each}
-        {#each reverseKeys as key, keyIndex}
-            <div
-                class="minorLine"
-                style="position: absolute; width: {grid.totalWidth(
-                    timeSignature,
-                )}px; height: 1px; top: {keyIndex * keyHeight}px; z-index: -1;"
-            ></div>
-        {/each}
-        {#each measureLines as posX, i}
-            <div
-                class="measureLine"
-                style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX}px; z-index: 1;"
-            ></div>
-            <div
-                class="measureLine"
-                style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX +
-                    3}px; z-index: 1;"
-            ></div>
-        {/each}
+        <div
+            class="keyboard"
+            style="grid-template-rows: repeat({numKeys}, {keyHeight}px); margin-right: 5px;"
+        >
+            {#each reverseKeys as key, keyIndex}
+                <button
+                    type="button"
+                    class="key"
+                    style="height: {keyHeight}px; width: 30px; background-color: {pianoColor(
+                        key,
+                    )}"
+                    on:click={() => playNote(key)}
+                >
+                </button>
+            {/each}
+        </div>
+        <div
+            class="gridBackground"
+            style="position: relative; height: {grid.totalHeight()}px; width: {grid.totalWidth(
+                timeSignature,
+            )}px"
+        >
+            {#each majorLines as posX, i}
+                <div
+                    class="majorLine"
+                    style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
+                ></div>
+            {/each}
+            {#each minorLines as posX, i}
+                <div
+                    class="minorLine"
+                    style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px; z-index: -1;"
+                ></div>
+            {/each}
+            {#each reverseKeys as key, keyIndex}
+                <div
+                    class="minorLine"
+                    style="position: absolute; width: {grid.totalWidth(
+                        timeSignature,
+                    )}px; height: 1px; top: {keyIndex *
+                        keyHeight}px; z-index: -1;"
+                ></div>
+            {/each}
+            {#each measureLines as posX, i}
+                <div
+                    class="measureLine"
+                    style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX}px; z-index: 1;"
+                ></div>
+                <div
+                    class="measureLine"
+                    style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX +
+                        3}px; z-index: 1;"
+                ></div>
+            {/each}
+        </div>
     </div>
 </div>
 
@@ -157,7 +185,7 @@
         background-color: #d1cbcb;
         z-index: 1;
     }
-    .measureLine{
+    .measureLine {
         background-color: #000000;
     }
     .majorLine {
