@@ -10,6 +10,7 @@
         Radio,
         Kbd,
         Label,
+        Input
     } from "flowbite-svelte";
 
     import { ChevronDownOutline } from "flowbite-svelte-icons";
@@ -29,10 +30,8 @@
     ).flat();
     let grid = new PianoRollGrid(2, keys.length, keyHeight, 50);
 
-    let timeSignatureNumeratorString = "4";
-    let timeSignatureDenominatorString = "4";
-    $: timeSignatureNumerator = parseInt(timeSignatureNumeratorString);
-    $: timeSignatureDenominator = parseInt(timeSignatureDenominatorString);
+    let timeSignatureNumerator = 4;
+    let timeSignatureDenominator = 4;
     $: timeSignature = new TimeSignature(
         timeSignatureNumerator,
         timeSignatureDenominator,
@@ -48,8 +47,6 @@
     );
     $: minorLines = grid.minorLinesPosX(timeSignature, Division.Quarter);
     $: measureLines = grid.measureLinesPosX(timeSignature);
-    $: console.log(timeSignature)
-    $: console.log(grid)
 
     var audioContext: AudioContext;
     onMount(() => {
@@ -70,55 +67,48 @@
 </script>
 
 <div>
-    <div class="flex ml-2 mt-2">
-        <div class="rounded flex items-center px-2 text-sm">
-            Time signature
-            <Select
-                items={TimeSignature.allNumerators().map((n) => {
-                    return { value: n, name: n };
-                })}
-                bind:value={timeSignatureNumeratorString}
-                placeholder=""
-                class="w-24 ml-2 space-y-1 bg-gray-300 justify-center"
-                size="sm"
-            />
-            <Select
-                items={TimeSignature.allDenominators().map((n) => {
-                    return { value: n, name: n };
-                })}
-                bind:value={timeSignatureDenominatorString}
-                placeholder=""
-                class="w-24 bg-gray-300"
-                size="sm"
-            />
-            <Select
-                items={complexityPatterns.map((n) => {
-                    return { value: n, name: n };
-                })}
-                bind:value={complexityPattern}
-                placeholder="pattern"
-                class="bg-gray-300"
-                size="sm"
+    <div class="inline-flex ml-2 bg-gray-100 mt-2 divide-x">
+        <div class="flex items-center text-sm ">
+            <div class="flex divide-x">
+                <div class="mx-2 h-full text-nowrap text-sm text-center border-b-2 py-2">Time signature</div>
+                <Select
+                    items={TimeSignature.allNumerators().map((n) => {
+                        return { value: n, name: n };
+                    })}
+                    bind:value={timeSignatureNumerator}
+                    placeholder="numerator"
+                    class="w-14 ml-2 bg-gray-100 py-0 border-none"
+                    underline={true}
                 />
-
+                <Select
+                    items={TimeSignature.allDenominators().map((n) => {
+                        return { value: n, name: n };
+                    })}
+                    bind:value={timeSignatureDenominator}
+                    placeholder="denominator"
+                    class="w-14 bg-gray-100 py-0 border-none"
+                    underline={true}
+                    size="sm"
+                />
+                <Select
+                    items={complexityPatterns.map((n) => {
+                        return { value: n, name: n };
+                    })}
+                    bind:value={complexityPattern}
+                    placeholder="pattern"
+                    class="bg-gray-100 w-40 p-0 border-none"
+                    size="sm"
+                    underline={true}
+                />
+            </div>
         </div>
-
-        <Kbd class="px-2 py-1.5" style="margin-right: 5px; margin-left: 5px;"
-            >Tempo:</Kbd
-        >
-        <input
-            type="number"
-            min="1"
-            max="300"
-            step="1"
-            value="120"
-            style="width: 50px;"
-        />
+        <div class="flex w-10% bg-gray-100 items-center">
+            <div class="mx-2 text-nowrap text-sm">BPM</div>
+            <Input type="number" id="bpm" placeholder="120" required class="bg-gray-100 w-20 border-none text-sm"/>
+        </div>
     </div>
 
-    <div
-        class="flex ml-2"
-    >
+    <div class="flex ml-2">
         <div
             class="keyboard"
             style="grid-template-rows: repeat({numKeys}, {keyHeight}px); margin-right: 5px;"
