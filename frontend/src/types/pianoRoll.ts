@@ -283,4 +283,7 @@ export class PianoRollGrid {
         return gridLines;
     }
 
+    posXToTime(posX: number, bpm: number): number {
+        return posX / this.eighthNoteWidth * 60 / bpm;
+    }
 }

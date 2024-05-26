@@ -26,7 +26,7 @@
     let timeSignatureNumerator = 4;
     let timeSignatureDenominator = 4;
     let division = Division.Quarter;
-    let tuplet = Tuplet.None
+    let tuplet = Tuplet.None;
     $: timeSignature = new TimeSignature(
         timeSignatureNumerator,
         timeSignatureDenominator,
@@ -65,7 +65,7 @@
     <div class="inline-flex ml-2 bg-gray-100 mt-2 h-10">
         <div class="flex text-sm">
             <div class="flex items-center">
-                <span class="ml-2 text-sm">Time Signature</span>
+                <span class="ml-4 text-sm">Time Signature</span>
                 <Select
                     items={TimeSignature.allNumerators().map((n) => {
                         return { value: n, name: n };
@@ -84,8 +84,10 @@
                     size="sm"
                 />
             </div>
-            <div class="flex items-center border-2 border-gray-300 border-r-0 border-t-0 border-b-0">
-                <span class="text-sm ml-2">Pattern</span>
+            <div
+                class="flex items-center border-2 border-gray-300 border-r-0 border-t-0 border-b-0"
+            >
+                <span class="text-sm ml-4">Pattern</span>
                 <Select
                     items={complexityPatterns.map((n) => {
                         return { value: n, name: n };
@@ -99,7 +101,7 @@
             <div
                 class="flex bg-gray-100 items-center border-2 border-gray-300 border-r-0 border-t-0 border-b-0 mr-2"
             >
-                <span class="text-sm ml-2">BPM</span>
+                <span class="text-sm ml-4">BPM</span>
                 <Input
                     type="number"
                     id="bpm"
@@ -108,8 +110,10 @@
                     class="bg-gray-100 w-20 border-none rounded-none p-0 text-center text-sm"
                 />
             </div>
-            <div class="flex items-center border-2 border-gray-300 border-r-0 border-t-0 border-b-0">
-                <span class="text-sm ml-2 mr-2">Division</span>
+            <div
+                class="flex items-center border-2 border-gray-300 border-r-0 border-t-0 border-b-0"
+            >
+                <span class="text-sm ml-4 mr-2">Division</span>
                 <Select
                     items={allDivisions().map((n) => {
                         return { value: n, name: n };
@@ -119,8 +123,10 @@
                     class="bg-gray-100 p-0 w-32 border-none rounded-none text-center text-sm"
                     size="sm"
                 />
-                <div class="flex items-center border-2 border-gray-300 border-r-0 border-t-0 border-b-0">
-                    <span class="text-sm ml-2 mr-2">Tuplet</span>
+                <div
+                    class="flex items-center border-2 border-gray-300 border-r-0 border-t-0 border-b-0"
+                >
+                    <span class="text-sm ml-4">Tuplet</span>
                     <Select
                         items={allTuplets().map((n) => {
                             return { value: n, name: n };
