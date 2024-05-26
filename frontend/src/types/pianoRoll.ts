@@ -114,21 +114,41 @@ export class TimeSignature {
         }
     }
 
-    numDivisionsPerMeasure(division: Division): number {
+    numDivisionsPerMeasure(division: Division, tuplet: Tuplet): number {
+        var numDivisions;
         switch (division) {
             case Division.Whole:
-                return this.numerator / this.denominator;
+                numDivisions = this.numerator / this.denominator;
+                break;
             case Division.Half:
-                return 2 * this.numerator / this.denominator;
+                numDivisions =  2 * this.numerator / this.denominator;
+                break
             case Division.Quarter:
-                return 4 * this.numerator / this.denominator;
+                numDivisions = 4 * this.numerator / this.denominator;
+                break;
             case Division.Eighth:
-                return 8 * this.numerator / this.denominator;
+                numDivisions = 8 * this.numerator / this.denominator;
+                break;
             case Division.Sixteenth:
-                return 16 * this.numerator / this.denominator;
+                numDivisions = 16 * this.numerator / this.denominator;
+                break;
             case Division.ThirtySecond:
-                return 32 * this.numerator / this.denominator;
+                numDivisions = 32 * this.numerator / this.denominator;
+                break;
         }
+        switch (tuplet) {
+            case Tuplet.None:
+                return numDivisions;
+            case Tuplet.Triplet:
+                return numDivisions * 3 / 2;
+            case Tuplet.Quintuplet:
+                return numDivisions * 5 / 2;
+            case Tuplet.Septuplet:
+                return numDivisions * 7 / 2;
+            case Tuplet.Nonuplet:
+                return numDivisions * 9 / 2;
+        }
+        return numDivisions;
     }
 
     static allNumerators(): number[] {
@@ -244,7 +264,7 @@ export class PianoRollGrid {
     minorLinesPosX(timeSignature: TimeSignature, division: Division, tuplet: Tuplet): number[] {
         const gridLines = [];
         let current = 0;
-        for (let i = 0; i < this.measures * timeSignature.numDivisionsPerMeasure(division); i++) {
+        for (let i = 0; i < this.measures * timeSignature.numDivisionsPerMeasure(division, tuplet); i++) {
             gridLines.push(current);
             current += this.divisionLength(division, tuplet);
         }
