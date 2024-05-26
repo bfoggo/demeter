@@ -62,14 +62,14 @@
     <div class="inline-flex ml-2 bg-gray-100 mt-2 h-10">
         <div class="flex text-sm">
             <div class="flex items-center">
-                <span class="ml-2 mr-4 text-sm">Time Signature:</span>
+                <span class="ml-2 text-sm">Time Signature</span>
                 <Select
                     items={TimeSignature.allNumerators().map((n) => {
                         return { value: n, name: n };
                     })}
                     bind:value={timeSignatureNumerator}
                     placeholder="N"
-                    class="bg-gray-100 py-0 w-16 border-l-1 border-r-0 border-t-0 border-b-0 rounded-none text-center text-align-center"
+                    class="bg-gray-100 py-0 w-16 border-none rounded-none text-center text-align-center"
                 />
                 <Select
                     items={TimeSignature.allDenominators().map((n) => {
@@ -82,38 +82,38 @@
                 />
             </div>
             <div class="flex items-center border-2 border-gray-300 border-r-0 border-t-0 border-b-0">
-                <span class="text-sm ml-2 mr-4">Pattern:</span>
+                <span class="text-sm ml-2">Pattern</span>
                 <Select
                     items={complexityPatterns.map((n) => {
                         return { value: n, name: n };
                     })}
                     bind:value={complexityPattern}
                     placeholder="complexity pattern"
-                    class="bg-gray-100 p-0 w-40 border-l-1 border-r-0 border-t-0 border-b-0 rounded-none text-center "
+                    class="bg-gray-100 p-0 w-40 border-none rounded-none text-center "
                     size="sm"
                 />
             </div>
             <div
                 class="flex bg-gray-100 items-center border-2 border-gray-300 border-r-0 border-t-0 border-b-0 mr-2"
             >
-                <span class="text-sm ml-2 mr-4">BPM:</span>
+                <span class="text-sm ml-2">BPM</span>
                 <Input
                     type="number"
                     id="bpm"
                     placeholder="120"
                     required
-                    class="bg-gray-100 w-20 border-l-1 border-r-0 border-t-0 border-b-0 rounded-none p-0 text-center text-sm"
+                    class="bg-gray-100 w-20 border-none rounded-none p-0 text-center text-sm"
                 />
             </div>
             <div class="flex items-center border-2 border-gray-300 border-r-0 border-t-0 border-b-0">
-                <span class="text-sm ml-2 mr-4">Division:</span>
+                <span class="text-sm ml-2 mr-2">Division</span>
                 <Select
                     items={allDivisions().map((n) => {
                         return { value: n, name: n };
                     })}
                     bind:value={division}
                     placeholder="complexity pattern"
-                    class="bg-gray-100 p-0 w-32 border-l-1 border-r-0 border-t-0 border-b-0 rounded-none text-center text-sm"
+                    class="bg-gray-100 p-0 w-32 border-none rounded-none text-center text-sm"
                     size="sm"
                 />
             </div>
