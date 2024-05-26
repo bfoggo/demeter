@@ -12,7 +12,7 @@
             {#each options as option}
                 <button
                     type="button"
-                    on:click={() => {
+                    on:mousedown={() => {
                         selected = option;
                         isOpen = false;
                     }}
@@ -26,7 +26,7 @@
     <button
         type="button"
         class="dropdown"
-        on:click={() => {
+        on:mousedown={() => {
             isOpen = !isOpen;
         }}
     >

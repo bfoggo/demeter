@@ -120,7 +120,7 @@
                     style="height: {keyHeight}px; width: 30px; background-color: {pianoColor(
                         key,
                     )}"
-                    on:click={() => playNote(key)}
+                    on:mousedown={() => playNote(key)}
                 >
                 </button>
             {/each}
