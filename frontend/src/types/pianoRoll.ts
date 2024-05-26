@@ -23,6 +23,18 @@ export function allDivisions(): Division[] {
     return [Division.Whole, Division.Half, Division.Quarter, Division.Eighth, Division.Sixteenth, Division.ThirtySecond];
 }
 
+export enum Tuplet {
+    None = "None",
+    Triplet = "Triplet",
+    Quintuplet = "Quintuplet",
+    Septuplet = "Septuplet",
+    Nonuplet = "Nonuplet",
+}
+
+export function allTuplets(): Tuplet[] {
+    return [Tuplet.None, Tuplet.Triplet, Tuplet.Quintuplet, Tuplet.Septuplet, Tuplet.Nonuplet];
+}
+
 type ComplexityPattern = BeatComplexity[];
 
 
@@ -184,29 +196,57 @@ export class PianoRollGrid {
         return gridLinesAllMeasures;
     }
 
-    divisionLength(division: Division): number {
+    divisionLength(division: Division, tuplet: Tuplet): number {
+        let divisionLength = this.eighthNoteWidth;
+        console.log(divisionLength);
+        console.log(division, tuplet);
         switch (division) {
             case Division.Whole:
-                return 8 * this.eighthNoteWidth;
+                divisionLength *= 8;
+                break;
             case Division.Half:
-                return 4 * this.eighthNoteWidth;
+                divisionLength *= 4;
+                break;
             case Division.Quarter:
-                return 2 * this.eighthNoteWidth;
+                divisionLength *= 2;
+                break;
             case Division.Eighth:
-                return this.eighthNoteWidth;
+                divisionLength *= 1;
+                break;
             case Division.Sixteenth:
-                return this.eighthNoteWidth / 2;
+                divisionLength /= 2;
+                break;
             case Division.ThirtySecond:
-                return this.eighthNoteWidth / 4;
+                divisionLength /= 4;
+                break;
         }
+        console.log(divisionLength);
+        switch (tuplet) {
+            case Tuplet.None:
+                divisionLength *= 1;
+                break;
+            case Tuplet.Triplet:
+                divisionLength *= 2 / 3;
+                break;
+            case Tuplet.Quintuplet:
+                divisionLength *= 2 / 5;
+                break;
+            case Tuplet.Septuplet:
+                divisionLength *= 2 / 7;
+                break;
+            case Tuplet.Nonuplet:
+                divisionLength *= 2 / 9;
+                break;
+        }
+        return divisionLength;
     }
 
-    minorLinesPosX(timeSignature: TimeSignature, division: Division): number[] {
+    minorLinesPosX(timeSignature: TimeSignature, division: Division, tuplet: Tuplet): number[] {
         const gridLines = [];
         let current = 0;
         for (let i = 0; i < this.measures * timeSignature.numDivisionsPerMeasure(division); i++) {
             gridLines.push(current);
-            current += this.divisionLength(division);
+            current += this.divisionLength(division, tuplet);
         }
         gridLines.push(current);
         return gridLines;

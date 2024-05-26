@@ -12,6 +12,8 @@
         beatPatternStr,
         Division,
         allDivisions,
+        Tuplet,
+        allTuplets,
     } from "../types/pianoRoll";
     const numOctaves = 2;
     const startOctave = 4;
@@ -24,6 +26,7 @@
     let timeSignatureNumerator = 4;
     let timeSignatureDenominator = 4;
     let division = Division.Quarter;
+    let tuplet = Tuplet.None
     $: timeSignature = new TimeSignature(
         timeSignatureNumerator,
         timeSignatureDenominator,
@@ -37,7 +40,7 @@
         timeSignature,
         parseBeatPatternString(complexityPattern),
     );
-    $: minorLines = grid.minorLinesPosX(timeSignature, division);
+    $: minorLines = grid.minorLinesPosX(timeSignature, division, tuplet);
     $: measureLines = grid.measureLinesPosX(timeSignature);
 
     var audioContext: AudioContext;
@@ -116,6 +119,18 @@
                     class="bg-gray-100 p-0 w-32 border-none rounded-none text-center text-sm"
                     size="sm"
                 />
+                <div class="flex items-center border-2 border-gray-300 border-r-0 border-t-0 border-b-0">
+                    <span class="text-sm ml-2 mr-2">Tuplet</span>
+                    <Select
+                        items={allTuplets().map((n) => {
+                            return { value: n, name: n };
+                        })}
+                        bind:value={tuplet}
+                        placeholder="complexity pattern"
+                        class="bg-gray-100 p-0 w-32 border-none rounded-none text-center text-sm"
+                        size="sm"
+                    />
+                </div>
             </div>
         </div>
     </div>
