@@ -11,6 +11,7 @@
         parseBeatPatternString,
         beatPatternStr,
         Division,
+        allDivisions,
     } from "../types/pianoRoll";
     const numOctaves = 2;
     const startOctave = 4;
@@ -18,10 +19,11 @@
     const keys = Array.from({ length: numOctaves }, (_, i) =>
         Note.allFromOctave(startOctave + i),
     ).flat();
-    let grid = new PianoRollGrid(2, keys.length, keyHeight, 50);
+    let grid = new PianoRollGrid(2, keys.length, keyHeight, 80);
 
     let timeSignatureNumerator = 4;
     let timeSignatureDenominator = 4;
+    let division = Division.Quarter;
     $: timeSignature = new TimeSignature(
         timeSignatureNumerator,
         timeSignatureDenominator,
@@ -35,7 +37,7 @@
         timeSignature,
         parseBeatPatternString(complexityPattern),
     );
-    $: minorLines = grid.minorLinesPosX(timeSignature, Division.Quarter);
+    $: minorLines = grid.minorLinesPosX(timeSignature, division);
     $: measureLines = grid.measureLinesPosX(timeSignature);
 
     var audioContext: AudioContext;
@@ -103,10 +105,22 @@
                     class="bg-gray-100 w-20 border-l-1 border-r-0 border-t-0 border-b-0 rounded-none p-0 text-center text-sm"
                 />
             </div>
+            <div class="flex items-center border-2 border-gray-300 border-r-0 border-t-0 border-b-0">
+                <span class="text-sm ml-2 mr-4">Division:</span>
+                <Select
+                    items={allDivisions().map((n) => {
+                        return { value: n, name: n };
+                    })}
+                    bind:value={division}
+                    placeholder="complexity pattern"
+                    class="bg-gray-100 p-0 w-32 border-l-1 border-r-0 border-t-0 border-b-0 rounded-none text-center text-sm"
+                    size="sm"
+                />
+            </div>
         </div>
     </div>
 
-    <div class="flex ml-2">
+    <div class="mt-1 flex ml-2">
         <div
             class="keyboard"
             style="grid-template-rows: repeat({numKeys}, {keyHeight}px); margin-right: 5px;"

@@ -11,12 +11,16 @@ export enum BeatComplexity {
 }
 
 export enum Division {
-    Whole,
-    Half,
-    Quarter,
-    Eighth,
-    Sixteenth,
-    ThirtySecond,
+    Whole = "Whole",
+    Half = "Half",
+    Quarter = "Quarter",
+    Eighth  = "Eighth",
+    Sixteenth = "Sixteenth",
+    ThirtySecond = "ThirtySecond",
+}
+
+export function allDivisions(): Division[] {
+    return [Division.Whole, Division.Half, Division.Quarter, Division.Eighth, Division.Sixteenth, Division.ThirtySecond];
 }
 
 type ComplexityPattern = BeatComplexity[];
