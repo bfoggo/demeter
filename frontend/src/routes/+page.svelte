@@ -2,18 +2,8 @@
     import { onMount } from "svelte";
     import { Note, pianoColor } from "../types/note";
 
-    import {
-        Button,
-        Dropdown,
-        Select,
-        DropdownItem,
-        Radio,
-        Kbd,
-        Label,
-        Input
-    } from "flowbite-svelte";
-
-    import { ChevronDownOutline } from "flowbite-svelte-icons";
+    import Select from "flowbite-svelte/Select.svelte";
+    import Input from "flowbite-svelte/Input.svelte";
 
     import {
         PianoRollGrid,
@@ -67,44 +57,52 @@
 </script>
 
 <div>
-    <div class="inline-flex ml-2 bg-gray-100 mt-2 divide-x">
-        <div class="flex items-center text-sm ">
-            <div class="flex divide-x">
-                <div class="mx-2 h-full text-nowrap text-sm text-center border-b-2 py-2">Time signature</div>
+    <div class="inline-flex ml-2 bg-gray-100 mt-2 h-10">
+        <div class="flex text-sm">
+            <div class="flex items-center">
+                <span class="ml-2 mr-4 text-sm">Time Signature:</span>
                 <Select
                     items={TimeSignature.allNumerators().map((n) => {
                         return { value: n, name: n };
                     })}
                     bind:value={timeSignatureNumerator}
-                    placeholder="numerator"
-                    class="w-14 ml-2 bg-gray-100 py-0 border-none"
-                    underline={true}
+                    placeholder="N"
+                    class="bg-gray-100 py-0 w-16 border-l-1 border-r-0 border-t-0 border-b-0 rounded-none text-center text-align-center"
                 />
                 <Select
                     items={TimeSignature.allDenominators().map((n) => {
                         return { value: n, name: n };
                     })}
                     bind:value={timeSignatureDenominator}
-                    placeholder="denominator"
-                    class="w-14 bg-gray-100 py-0 border-none"
-                    underline={true}
+                    placeholder="D"
+                    class="bg-gray-100 py-0 w-16 border-l-1 border-r-0 border-t-0 border-b-0 rounded-none text-center "
                     size="sm"
                 />
+            </div>
+            <div class="flex items-center border-2 border-gray-300 border-r-0 border-t-0 border-b-0">
+                <span class="text-sm ml-2 mr-4">Pattern:</span>
                 <Select
                     items={complexityPatterns.map((n) => {
                         return { value: n, name: n };
                     })}
                     bind:value={complexityPattern}
-                    placeholder="pattern"
-                    class="bg-gray-100 w-40 p-0 border-none"
+                    placeholder="complexity pattern"
+                    class="bg-gray-100 p-0 w-40 border-l-1 border-r-0 border-t-0 border-b-0 rounded-none text-center "
                     size="sm"
-                    underline={true}
                 />
             </div>
-        </div>
-        <div class="flex w-10% bg-gray-100 items-center">
-            <div class="mx-2 text-nowrap text-sm">BPM</div>
-            <Input type="number" id="bpm" placeholder="120" required class="bg-gray-100 w-20 border-none text-sm"/>
+            <div
+                class="flex bg-gray-100 items-center border-2 border-gray-300 border-r-0 border-t-0 border-b-0 mr-2"
+            >
+                <span class="text-sm ml-2 mr-4">BPM:</span>
+                <Input
+                    type="number"
+                    id="bpm"
+                    placeholder="120"
+                    required
+                    class="bg-gray-100 w-20 border-l-1 border-r-0 border-t-0 border-b-0 rounded-none p-0 text-center text-sm"
+                />
+            </div>
         </div>
     </div>
 
