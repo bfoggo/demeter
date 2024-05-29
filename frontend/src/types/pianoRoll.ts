@@ -231,8 +231,6 @@ export class PianoRollGrid {
 
     divisionLength(division: Division, tuplet: Tuplet): number {
         let divisionLength = this.eighthNoteWidth;
-        console.log(divisionLength);
-        console.log(division, tuplet);
         switch (division) {
             case Division.Whole:
                 divisionLength *= 8;
@@ -253,7 +251,6 @@ export class PianoRollGrid {
                 divisionLength /= 4;
                 break;
         }
-        console.log(divisionLength);
         switch (tuplet) {
             case Tuplet.None:
                 divisionLength *= 1;
@@ -312,18 +309,4 @@ export class PianoRollGrid {
         return Math.floor(posY / this.keyHeight);
     }
 
-    findNearestGridLinePosXStart(posX: number, timeSignature: TimeSignature, division: Division, tuplet: Tuplet): number {
-        const minorLines = this.minorLinesPosX(timeSignature, division, tuplet);
-        let left = 0;
-        let right = minorLines.length - 1;
-        while (left < right) {
-            const mid = Math.floor((left + right) / 2);
-            if (minorLines[mid] < posX) {
-                left = mid + 1;
-            } else {
-                right = mid;
-            }
-        }
-        return minorLines[left];
-    }
 }
