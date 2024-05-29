@@ -160,18 +160,31 @@ export class TimeSignature {
     }
 }
 
+export class PianoRollNote {
+    key: number;
+    startTime: number;
+    duration: number;
+
+    constructor(key: number, startTime: number, duration: number) {
+        this.key = key;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+}
 
 export class PianoRollGrid {
     measures: number;
     numKeys: number;
     keyHeight: number;
     eighthNoteWidth: number;
+    notes: PianoRollNote[];
 
     constructor(measures: number, numKeys: number, keyHeight: number, eighthNoteWidth: number) {
         this.measures = measures;
         this.numKeys = numKeys;
         this.keyHeight = keyHeight;
         this.eighthNoteWidth = eighthNoteWidth;
+        this.notes = [];
     }
 
     setMeasures(measures: number) {
@@ -285,5 +298,32 @@ export class PianoRollGrid {
 
     posXToTime(posX: number, bpm: number): number {
         return posX / this.eighthNoteWidth * 60 / bpm;
+    }
+
+    timeToPosX(time: number, bpm: number): number {
+        return time * bpm / 60 * this.eighthNoteWidth;
+    }
+
+    keyToPosY(key: number): number {
+        return key * this.keyHeight;
+    }
+
+    posYToKey(posY: number): number {
+        return Math.floor(posY / this.keyHeight);
+    }
+
+    findNearestGridLinePosXStart(posX: number, timeSignature: TimeSignature, division: Division, tuplet: Tuplet): number {
+        const minorLines = this.minorLinesPosX(timeSignature, division, tuplet);
+        let left = 0;
+        let right = minorLines.length - 1;
+        while (left < right) {
+            const mid = Math.floor((left + right) / 2);
+            if (minorLines[mid] < posX) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        return minorLines[left];
     }
 }

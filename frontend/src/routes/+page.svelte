@@ -41,7 +41,9 @@
         parseBeatPatternString(complexityPattern),
     );
     $: minorLines = grid.minorLinesPosX(timeSignature, division, tuplet);
+    $:console.log(minorLines);
     $: measureLines = grid.measureLinesPosX(timeSignature);
+    $: divisionLength = grid.divisionLength(division, tuplet);
 
     var audioContext: AudioContext;
     onMount(() => {
@@ -175,6 +177,16 @@
                     class="minorLine"
                     style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px; z-index: -1;"
                 ></div>
+                {#each reverseKeys as key, keyIndex}
+                    <button
+                        type="button"
+                        class="hover:bg-gray-200"
+                        style="position: absolute; left: {posX}px; top: {keyIndex *
+                            keyHeight}px; height: {keyHeight}px; width: {divisionLength}px;
+                            "
+                        on:mousedown={() => playNote(key)}
+                    />
+                {/each}
             {/each}
             {#each reverseKeys as key, keyIndex}
                 <div
@@ -185,6 +197,12 @@
                         keyHeight}px; z-index: -1;"
                 ></div>
             {/each}
+            <div
+                    class="minorLine"
+                    style="position: absolute; width: {grid.totalWidth(
+                        timeSignature,
+                    )}px; height: 1px; top: {grid.totalHeight()}px; z-index: -1;"
+                ></div>
             {#each measureLines as posX, i}
                 <div
                     class="measureLine"
@@ -211,7 +229,6 @@
         margin: 0;
     }
     .gridBackground {
-        background-color: #d1cbcb;
         z-index: 1;
     }
     .measureLine {
@@ -221,7 +238,7 @@
         border-left-style: dashed;
         border-right: none;
         border-width: 2px;
-        border-color: #00851660;
+        border-color: #000000;
     }
     .minorLine {
         background-color: #a8a8a8;
