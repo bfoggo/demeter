@@ -298,7 +298,7 @@ export class PianoRollGrid {
     }
 
     timeToPosX(time: number, bpm: number): number {
-        return time * bpm / 60 * this.eighthNoteWidth;
+        return time / 60 * bpm  * (this.eighthNoteWidth * 2);
     }
 
     keyToPosY(key: number): number {

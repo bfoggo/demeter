@@ -4,6 +4,7 @@
 
     import Select from "flowbite-svelte/Select.svelte";
     import Input from "flowbite-svelte/Input.svelte";
+    import { writable } from "svelte/store";
 
     import {
         PianoRollGrid,
@@ -28,7 +29,47 @@
     let timeSignatureDenominator = 4;
     let division = Division.Quarter;
     let tuplet = Tuplet.None;
-    let timer = new PlaybackTimer();
+    let timer = writable(new PlaybackTimer());
+    var elapsedTime: number;
+    var timerPosX: number;
+
+    function startTimer() {
+        timer.update((t) => {
+            t.start();
+            return t;
+        });
+    }
+    function stopTimer() {
+        timer.update((t) => {
+            t.stop();
+            return t;
+        });
+    }
+
+    var timerIntervalid: number | null;
+    timer.subscribe((t) => {
+        if (t.playing) {
+            console.log("playing");
+            timerIntervalid = setInterval(() => {
+                elapsedTime = t.getElapsedTime()  / 1000;
+                console.log(elapsedTime)
+                timerPosX = grid.timeToPosX(elapsedTime, bpm);
+                console.log(timerPosX)
+                if (timerPosX > grid.totalWidth(timeSignature)) {
+                    console.log("stopping")
+                    stopTimer();
+                }
+            }, 100);
+        } else {
+            console.log("not playing");
+            if (timerIntervalid){ clearInterval(timerIntervalid); }
+        }
+        }
+    );
+
+
+    timer.subscribe;
+    let bpm = 120;
     $: timeSignature = new TimeSignature(
         timeSignatureNumerator,
         timeSignatureDenominator,
@@ -108,6 +149,7 @@
             >
                 <span class="text-sm ml-4 mr-2">BPM</span>
                 <Input
+                    bind:value={bpm}
                     type="number"
                     id="bpm"
                     placeholder="120"
@@ -146,7 +188,10 @@
         </div>
         <button
             type="button"
-            class="flex  items-center jusitfy-center border-2 border-gray-200 hover:bg-gray-200 border-r-0 border-t-0 border-b-0 px-2"
+            class="flex items-center jusitfy-center border-2 border-gray-200 hover:bg-gray-200 border-r-0 border-t-0 border-b-0 px-2"
+            on:click={() => {
+                startTimer();
+            }}
         >
             <svg
                 class="w-6 h-6 text-gray-800 dark:text-white"
@@ -193,13 +238,13 @@
         >
             {#each majorLines as posX, i}
                 <div
-                    class="majorLine"
+                    class="majorLine top-0"
                     style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
                 ></div>
             {/each}
             {#each minorLines as posX, i}
                 <div
-                    class="minorLine"
+                    class="minorLine top-0"
                     style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px; z-index: -1;"
                 ></div>
                 {#each reverseKeys as key, keyIndex}
@@ -230,11 +275,11 @@
             ></div>
             {#each measureLines as posX, i}
                 <div
-                    class="measureLine"
+                    class="measureLine top-0"
                     style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX}px; z-index: 1;"
                 ></div>
                 <div
-                    class="measureLine"
+                    class="measureLine top-0"
                     style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX +
                         3}px; z-index: 1;"
                 ></div>
