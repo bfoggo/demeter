@@ -49,19 +49,15 @@
     var timerIntervalid: number | null;
     timer.subscribe((t) => {
         if (t.playing) {
-            console.log("playing");
             timerIntervalid = setInterval(() => {
                 elapsedTime = t.getElapsedTime()  / 1000;
-                console.log(elapsedTime)
                 timerPosX = grid.timeToPosX(elapsedTime, bpm);
-                console.log(timerPosX)
                 if (timerPosX > grid.totalWidth(timeSignature)) {
-                    console.log("stopping")
                     stopTimer();
                 }
-            }, 100);
+            }, 10);
         } else {
-            console.log("not playing");
+            timerPosX = 0;
             if (timerIntervalid){ clearInterval(timerIntervalid); }
         }
         }
@@ -236,6 +232,8 @@
                 timeSignature,
             )}px"
         >
+        <div class="bg-violet-300 opacity-30 h-full w-2 absolute top-0 left-0" 
+        style="width: {timerPosX}px; z-index: 1;"/>
             {#each majorLines as posX, i}
                 <div
                     class="majorLine top-0"
