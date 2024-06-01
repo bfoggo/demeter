@@ -4,7 +4,7 @@
 
     import Select from "flowbite-svelte/Select.svelte";
     import Input from "flowbite-svelte/Input.svelte";
-    import { writable } from "svelte/store";
+    import { readable, writable } from "svelte/store";
 
     import {
         PianoRollGrid,
@@ -17,7 +17,8 @@
         allTuplets,
     } from "../types/pianoRoll";
     import { PlaybackTimer } from "../types/playback";
-    import { kickSound, highHatSound } from "../types/sounds";
+    import { kickSound, highHatSound} from "../types/sounds";
+    import type {Stoppable} from "../types/sounds";
 
     var audioContext: AudioContext;
     onMount(() => {
@@ -116,16 +117,22 @@
         });
     }
 
+    $: if(timeSignatureNumerator && timeSignatureDenominator && complexityPattern && bpm && division && tuplet) {
+        stopTimer();
+    }
+
     var timerIntervalid: number | null;
+    var stoppables: Stoppable[] = [];
     timer.subscribe((t) => {
         if (t.playing) {
+            stoppables = [];
             for (var majorLine of majorLines) {
-                    let time_at_major_line = grid.posXToTime(majorLine, bpm);
-                    kickSound(time_at_major_line, audioContext);
-                }
-            for (var minorLine of minorLines.slice(0, minorLines.length -1)) {
+                let time_at_major_line = grid.posXToTime(majorLine, bpm);
+                stoppables.push(kickSound(time_at_major_line, audioContext));
+            }
+            for (var minorLine of minorLines.slice(0, minorLines.length - 1)) {
                 let time_at_minor_line = grid.posXToTime(minorLine, bpm);
-                highHatSound(time_at_minor_line, audioContext);
+                stoppables.push(highHatSound(time_at_minor_line, audioContext));
             }
             timerIntervalid = setInterval(() => {
                 elapsedTime = t.getElapsedTime() / 1000;
@@ -138,6 +145,9 @@
             timerPosX = 0;
             if (timerIntervalid) {
                 clearInterval(timerIntervalid);
+            }
+            for (var stoppable of stoppables) {
+                stoppable.stop();
             }
         }
     });
