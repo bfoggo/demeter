@@ -1,10 +1,12 @@
 const SAMPLE_RATE = 44100;
-const CLIP_BUFFER = 0.01;
 
 export function kickSound(start: number, ctx: AudioContext) {
 
-    const decay = 0.5;
+    const decay = 0.3;
     const volume = 1;
+    const attack = 0.01;
+    const sustain = 0.01;
+    const release = 0.05;
 
     const osc = ctx.createOscillator();
     osc.type = 'triangle';
@@ -16,12 +18,12 @@ export function kickSound(start: number, ctx: AudioContext) {
 
     let realStart = start + current_time;
     
-    gain.gain.linearRampToValueAtTime(volume, realStart + CLIP_BUFFER);
-    gain.gain.exponentialRampToValueAtTime(0.01 * volume, realStart + decay);
-    gain.gain.linearRampToValueAtTime(0, decay + CLIP_BUFFER)
-    osc.start(realStart + CLIP_BUFFER);
-    osc.stop(realStart + decay + 2*CLIP_BUFFER);
-
+    gain.gain.value = 0;
+    gain.gain.linearRampToValueAtTime(volume, realStart + attack);
+    gain.gain.exponentialRampToValueAtTime(sustain * volume, realStart + attack + decay);
+    gain.gain.linearRampToValueAtTime(0, realStart + attack + decay + release);
+    osc.start(realStart);
+    osc.stop(realStart + attack + decay + release);
 }
 
 const whiteNoiseVector = Array.from({ length: SAMPLE_RATE }, () => Math.random() * 2 - 1);
@@ -36,6 +38,9 @@ const whiteNoiseBuffer = (ctx: AudioContext) => {
 export function highHatSound(start: number, ctx: AudioContext) {
     const decay = 0.2
     const volume = 0.05;
+    const attack = 0.02;
+    const sustain = 0.05;
+    const release = 0.01;
 
     const noise = ctx.createBufferSource();
     const gain = ctx.createGain();
@@ -46,11 +51,12 @@ export function highHatSound(start: number, ctx: AudioContext) {
 
     let realStart = start + current_time;
 
-    gain.gain.linearRampToValueAtTime(volume, realStart + CLIP_BUFFER);
-    gain.gain.exponentialRampToValueAtTime(0.01 * volume, realStart + decay);
-    gain.gain.linearRampToValueAtTime(0, decay + CLIP_BUFFER)
+    gain.gain.value = 0
+    gain.gain.linearRampToValueAtTime(volume, realStart + attack);
+    gain.gain.exponentialRampToValueAtTime(sustain * volume, realStart + attack + decay);
+    gain.gain.linearRampToValueAtTime(0, realStart + attack + decay + release);
     noise.start(realStart);
-    noise.stop(realStart + decay + CLIP_BUFFER);
+    noise.stop(realStart + decay + attack + release);
 }
 
 export function emptySound(start: number, ctx: AudioContext) {
