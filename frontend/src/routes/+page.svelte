@@ -17,6 +17,13 @@
         allTuplets,
     } from "../types/pianoRoll";
     import { PlaybackTimer } from "../types/playback";
+
+    var audioContext: AudioContext;
+    onMount(() => {
+        audioContext = new AudioContext();
+    });
+
+
     const numOctaves = 2;
     const startOctave = 4;
     const keyHeight = 20;
@@ -32,6 +39,52 @@
     let timer = writable(new PlaybackTimer());
     var elapsedTime: number;
     var timerPosX: number;
+    let bpm = 120;
+    let reverseKeys = keys.slice().reverse();
+    let numKeys = keys.length;
+    $: timeSignature = new TimeSignature(
+        timeSignatureNumerator,
+        timeSignatureDenominator,
+    );
+    $: complexityPatterns = timeSignature
+        .complexityPatterns()
+        .map(beatPatternStr);
+    $: defaultBeatPattern = complexityPatterns[0];
+    $: complexityPattern = defaultBeatPattern;
+    $: majorLines = grid.majorLinesPosX(
+        timeSignature,
+        parseBeatPatternString(complexityPattern),
+    );
+    $: minorLines = grid.minorLinesPosX(timeSignature, division, tuplet);
+    $: measureLines = grid.measureLinesPosX(timeSignature);
+    $: divisionLength = grid.divisionLength(division, tuplet);
+
+    function playNote(note: Note) {
+        let oscillator = audioContext.createOscillator();
+        oscillator.type = "sine";
+        oscillator.frequency.value = note.frequency();
+        oscillator.connect(audioContext.destination);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.5);
+    }
+
+    let majorBeatLock = false;
+    const MAJOR_BEAT_LENGTH = 0.25;
+    function playMajorBeat() {
+        if (majorBeatLock) {
+            return;
+        }
+        let oscillator = audioContext.createOscillator();
+        oscillator.type = "sine";
+        oscillator.frequency.value = 440;
+        oscillator.connect(audioContext.destination);
+        oscillator.start();
+        majorBeatLock = true;
+        oscillator.stop(audioContext.currentTime + MAJOR_BEAT_LENGTH);
+        oscillator.onended = () => {
+            majorBeatLock = false;
+        };
+    }
 
     function startTimer() {
         timer.update((t) => {
@@ -50,55 +103,28 @@
     timer.subscribe((t) => {
         if (t.playing) {
             timerIntervalid = setInterval(() => {
-                elapsedTime = t.getElapsedTime()  / 1000;
+                elapsedTime = t.getElapsedTime() / 1000;
                 timerPosX = grid.timeToPosX(elapsedTime, bpm);
                 if (timerPosX > grid.totalWidth(timeSignature)) {
                     stopTimer();
                 }
+                for (var majorLine of majorLines) {
+                    let time_at_major_line = grid.posXToTime(majorLine, bpm);
+                    if (
+                        elapsedTime >= time_at_major_line &&
+                        elapsedTime < time_at_major_line + MAJOR_BEAT_LENGTH
+                    ) {
+                        playMajorBeat();
+                    }
+                }
             }, 10);
         } else {
             timerPosX = 0;
-            if (timerIntervalid){ clearInterval(timerIntervalid); }
+            if (timerIntervalid) {
+                clearInterval(timerIntervalid);
+            }
         }
-        }
-    );
-
-
-    timer.subscribe;
-    let bpm = 120;
-    $: timeSignature = new TimeSignature(
-        timeSignatureNumerator,
-        timeSignatureDenominator,
-    );
-    $: complexityPatterns = timeSignature
-        .complexityPatterns()
-        .map(beatPatternStr);
-    $: defaultBeatPattern = complexityPatterns[0];
-    $: complexityPattern = defaultBeatPattern;
-    $: majorLines = grid.majorLinesPosX(
-        timeSignature,
-        parseBeatPatternString(complexityPattern),
-    );
-    $: minorLines = grid.minorLinesPosX(timeSignature, division, tuplet);
-    $: measureLines = grid.measureLinesPosX(timeSignature);
-    $: divisionLength = grid.divisionLength(division, tuplet);
-
-    var audioContext: AudioContext;
-    onMount(() => {
-        audioContext = new AudioContext();
     });
-
-    let reverseKeys = keys.slice().reverse();
-    let numKeys = keys.length;
-
-    function playNote(note: Note) {
-        let oscillator = audioContext.createOscillator();
-        oscillator.type = "sine";
-        oscillator.frequency.value = note.frequency();
-        oscillator.connect(audioContext.destination);
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.5);
-    }
 </script>
 
 <div>
@@ -232,8 +258,10 @@
                 timeSignature,
             )}px"
         >
-        <div class="bg-violet-300 opacity-30 h-full w-2 absolute top-0 left-0" 
-        style="width: {timerPosX}px; z-index: 1;"/>
+            <div
+                class="bg-violet-300 opacity-30 h-full w-2 absolute top-0 left-0"
+                style="width: {timerPosX}px; z-index: 1;"
+            />
             {#each majorLines as posX, i}
                 <div
                     class="majorLine top-0"

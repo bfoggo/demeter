@@ -294,7 +294,7 @@ export class PianoRollGrid {
     }
 
     posXToTime(posX: number, bpm: number): number {
-        return posX / this.eighthNoteWidth * 60 / bpm;
+        return posX / this.eighthNoteWidth / 2 * 60 / bpm;
     }
 
     timeToPosX(time: number, bpm: number): number {
