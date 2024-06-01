@@ -70,19 +70,37 @@
 
     let majorBeatLock = false;
     const MAJOR_BEAT_LENGTH = 0.25;
+    const MINOR_BEAT_LENGTH = 0.1;
     function playMajorBeat() {
         if (majorBeatLock) {
             return;
         }
+        majorBeatLock = true;
         let oscillator = audioContext.createOscillator();
         oscillator.type = "sine";
         oscillator.frequency.value = 440;
         oscillator.connect(audioContext.destination);
         oscillator.start();
-        majorBeatLock = true;
         oscillator.stop(audioContext.currentTime + MAJOR_BEAT_LENGTH);
         oscillator.onended = () => {
             majorBeatLock = false;
+        };
+    }
+
+    let minorBeatLock = false;
+    function playMinorBeat() {
+        if (minorBeatLock) {
+            return;
+        }
+        minorBeatLock = true;
+        let oscillator = audioContext.createOscillator();
+        oscillator.type = "sine";
+        oscillator.frequency.value = 880;
+        oscillator.connect(audioContext.destination);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.1);
+        oscillator.onended = () => {
+            minorBeatLock = false;
         };
     }
 
@@ -115,6 +133,12 @@
                         elapsedTime < time_at_major_line + MAJOR_BEAT_LENGTH
                     ) {
                         playMajorBeat();
+                    }
+                }
+                for (var minorLine of minorLines) {
+                    let time_at_minor_line = grid.posXToTime(minorLine, bpm);
+                    if (elapsedTime >= time_at_minor_line && elapsedTime < time_at_minor_line + MINOR_BEAT_LENGTH) {
+                        playMinorBeat();
                     }
                 }
             }, 10);
