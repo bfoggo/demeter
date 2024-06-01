@@ -17,12 +17,12 @@
         allTuplets,
     } from "../types/pianoRoll";
     import { PlaybackTimer } from "../types/playback";
+    import { kickSound } from "../types/sounds";
 
     var audioContext: AudioContext;
     onMount(() => {
         audioContext = new AudioContext();
     });
-
 
     const numOctaves = 2;
     const startOctave = 4;
@@ -69,7 +69,6 @@
     }
 
     let majorBeatLock = false;
-    const MAJOR_BEAT_LENGTH = 0.25;
     const MINOR_BEAT_LENGTH = 0.1;
     function playMajorBeat() {
         if (majorBeatLock) {
@@ -120,27 +119,26 @@
     var timerIntervalid: number | null;
     timer.subscribe((t) => {
         if (t.playing) {
+            for (var majorLine of majorLines) {
+                    let time_at_major_line = grid.posXToTime(majorLine, bpm);
+                    kickSound(time_at_major_line, audioContext);
+                }
             timerIntervalid = setInterval(() => {
                 elapsedTime = t.getElapsedTime() / 1000;
                 timerPosX = grid.timeToPosX(elapsedTime, bpm);
                 if (timerPosX > grid.totalWidth(timeSignature)) {
                     stopTimer();
                 }
-                for (var majorLine of majorLines) {
-                    let time_at_major_line = grid.posXToTime(majorLine, bpm);
-                    if (
-                        elapsedTime >= time_at_major_line &&
-                        elapsedTime < time_at_major_line + MAJOR_BEAT_LENGTH
-                    ) {
-                        playMajorBeat();
-                    }
-                }
-                for (var minorLine of minorLines) {
-                    let time_at_minor_line = grid.posXToTime(minorLine, bpm);
-                    if (elapsedTime >= time_at_minor_line && elapsedTime < time_at_minor_line + MINOR_BEAT_LENGTH) {
-                        playMinorBeat();
-                    }
-                }
+                
+                //for (var minorLine of minorLines) {
+                //    let time_at_minor_line = grid.posXToTime(minorLine, bpm);
+                //    if (
+                //        elapsedTime >= time_at_minor_line &&
+                //        elapsedTime < time_at_minor_line + MINOR_BEAT_LENGTH
+                //    ) {
+                //        playMinorBeat();
+                //    }
+                //}
             }, 10);
         } else {
             timerPosX = 0;
