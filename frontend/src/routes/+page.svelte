@@ -119,7 +119,7 @@
     var timerIntervalid: number | null;
     timer.subscribe((t) => {
         if (t.playing) {
-            for (var majorLine of majorLines.slice(0, majorLines.length - 1)) {
+            for (var majorLine of majorLines) {
                     let time_at_major_line = grid.posXToTime(majorLine, bpm);
                     kickSound(time_at_major_line, audioContext);
                 }

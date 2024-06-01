@@ -225,7 +225,7 @@ export class PianoRollGrid {
             }
         }
         gridLines.push(current);
-        let gridLinesAllMeasures = Array.from({ length: this.measures }, (_, i) => i).map(i => gridLines.map(l => l + i * this.measureWidth(timeSignature))).flat();
+        let gridLinesAllMeasures = Array.from({ length: this.measures }, (_, i) => i).map(i => gridLines.slice(0, gridLines.length - 1).map(l => l + i * this.measureWidth(timeSignature))).flat();
         return gridLinesAllMeasures;
     }
 
