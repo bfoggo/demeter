@@ -238,6 +238,7 @@
             type="button"
             class="flex items-center jusitfy-center border-2 border-gray-200 hover:bg-gray-200 border-r-0 border-t-0 border-b-0 px-2"
             on:click={() => {
+                stopTimer();
                 startTimer();
             }}
         >
