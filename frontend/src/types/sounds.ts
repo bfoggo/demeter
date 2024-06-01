@@ -4,6 +4,33 @@ export interface Stoppable {
     stop: () => void;
 }
 
+export function noteSound(start: number, frequency: number, ctx: AudioContext): Stoppable {
+    const decay = 0.2;
+    const volume = 0.3;
+    const attack = 0.01;
+    const sustain = 0.01;
+    const release = 0.05;
+
+    const osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    const gain = ctx.createGain();
+    const current_time = ctx.currentTime;
+    osc.frequency.value = frequency;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    let realStart = start + current_time;
+    
+    gain.gain.value = 0;
+    gain.gain.linearRampToValueAtTime(volume, realStart + attack);
+    gain.gain.exponentialRampToValueAtTime(sustain * volume, realStart + attack + decay);
+    gain.gain.linearRampToValueAtTime(0, realStart + attack + decay + release);
+    osc.start(realStart);
+    osc.stop(realStart + attack + decay + release);
+
+    return osc as Stoppable;
+}
+
 export function kickSound(start: number, ctx: AudioContext): Stoppable {
 
     const decay = 0.3;

@@ -17,7 +17,7 @@
         allTuplets,
     } from "../types/pianoRoll";
     import { PlaybackTimer } from "../types/playback";
-    import { kickSound, highHatSound} from "../types/sounds";
+    import { kickSound, highHatSound, noteSound} from "../types/sounds";
     import type {Stoppable} from "../types/sounds";
 
     var audioContext: AudioContext;
@@ -61,12 +61,7 @@
     $: divisionLength = grid.divisionLength(division, tuplet);
 
     function playNote(note: Note) {
-        let oscillator = audioContext.createOscillator();
-        oscillator.type = "sine";
-        oscillator.frequency.value = note.frequency();
-        oscillator.connect(audioContext.destination);
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.5);
+        noteSound(0.0, note.frequency(), audioContext);
     }
 
     let majorBeatLock = false;
