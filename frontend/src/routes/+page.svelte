@@ -17,7 +17,7 @@
         allTuplets,
     } from "../types/pianoRoll";
     import { PlaybackTimer } from "../types/playback";
-    import { kickSound } from "../types/sounds";
+    import { kickSound, highHatSound } from "../types/sounds";
 
     var audioContext: AudioContext;
     onMount(() => {
@@ -119,26 +119,20 @@
     var timerIntervalid: number | null;
     timer.subscribe((t) => {
         if (t.playing) {
-            for (var majorLine of majorLines) {
+            for (var majorLine of majorLines.slice(0, majorLines.length - 1)) {
                     let time_at_major_line = grid.posXToTime(majorLine, bpm);
                     kickSound(time_at_major_line, audioContext);
                 }
+            for (var minorLine of minorLines.slice(0, minorLines.length -1)) {
+                let time_at_minor_line = grid.posXToTime(minorLine, bpm);
+                highHatSound(time_at_minor_line, audioContext);
+            }
             timerIntervalid = setInterval(() => {
                 elapsedTime = t.getElapsedTime() / 1000;
                 timerPosX = grid.timeToPosX(elapsedTime, bpm);
                 if (timerPosX > grid.totalWidth(timeSignature)) {
                     stopTimer();
                 }
-                
-                //for (var minorLine of minorLines) {
-                //    let time_at_minor_line = grid.posXToTime(minorLine, bpm);
-                //    if (
-                //        elapsedTime >= time_at_minor_line &&
-                //        elapsedTime < time_at_minor_line + MINOR_BEAT_LENGTH
-                //    ) {
-                //        playMinorBeat();
-                //    }
-                //}
             }, 10);
         } else {
             timerPosX = 0;
