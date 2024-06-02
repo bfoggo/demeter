@@ -157,7 +157,7 @@
                     })}
                     bind:value={timeSignatureNumerator}
                     placeholder="N"
-                    class="bg-gray-100 hover:bg-gray-300 py-0 w-16 border-none rounded-none text-center text-align-center hover:cursor-pointer"
+                    class="bg-gray-100 hover:bg-gray-300 py-0 w-20 border-none rounded-none text-center text-align-center hover:cursor-pointer"
                 />
                 <Select
                     items={TimeSignature.allDenominators().map((n) => {
