@@ -17,8 +17,8 @@
         allTuplets,
     } from "../types/pianoRoll";
     import { PlaybackTimer } from "../types/playback";
-    import { kickSound, highHatSound, noteSound} from "../types/sounds";
-    import type {Stoppable} from "../types/sounds";
+    import { kickSound, highHatSound, noteSound } from "../types/sounds";
+    import type { Stoppable } from "../types/sounds";
 
     var audioContext: AudioContext;
     onMount(() => {
@@ -64,41 +64,6 @@
         noteSound(0.0, note.frequency(), audioContext);
     }
 
-    let majorBeatLock = false;
-    const MINOR_BEAT_LENGTH = 0.1;
-    function playMajorBeat() {
-        if (majorBeatLock) {
-            return;
-        }
-        majorBeatLock = true;
-        let oscillator = audioContext.createOscillator();
-        oscillator.type = "sine";
-        oscillator.frequency.value = 440;
-        oscillator.connect(audioContext.destination);
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + MAJOR_BEAT_LENGTH);
-        oscillator.onended = () => {
-            majorBeatLock = false;
-        };
-    }
-
-    let minorBeatLock = false;
-    function playMinorBeat() {
-        if (minorBeatLock) {
-            return;
-        }
-        minorBeatLock = true;
-        let oscillator = audioContext.createOscillator();
-        oscillator.type = "sine";
-        oscillator.frequency.value = 880;
-        oscillator.connect(audioContext.destination);
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.1);
-        oscillator.onended = () => {
-            minorBeatLock = false;
-        };
-    }
-
     function startTimer() {
         timer.update((t) => {
             t.start();
@@ -112,7 +77,14 @@
         });
     }
 
-    $: if(timeSignatureNumerator && timeSignatureDenominator && complexityPattern && bpm && division && tuplet) {
+    $: if (
+        timeSignatureNumerator &&
+        timeSignatureDenominator &&
+        complexityPattern &&
+        bpm &&
+        division &&
+        tuplet
+    ) {
         stopTimer();
     }
 
