@@ -61,6 +61,8 @@
     $: measureLines = grid.measureLinesPosX(timeSignature);
     $: divisionLength = grid.divisionLength(division, tuplet);
 
+    var midiNotes: PianoRollNote[] = [];
+
     function playNote(note: Note) {
         noteSound(0.0, note.frequency(), audioContext);
     }
@@ -101,6 +103,16 @@
             for (var minorLine of minorLines.slice(0, minorLines.length - 1)) {
                 let time_at_minor_line = grid.posXToTime(minorLine, bpm);
                 stoppables.push(highHatSound(time_at_minor_line, audioContext));
+            }
+            for (var midiNote of midiNotes) {
+                let time_at_midi_note = grid.posXToTime(midiNote.startPosX, bpm);
+                stoppables.push(
+                    noteSound(
+                        time_at_midi_note,
+                        keys[keys.length - midiNote.key - 1].frequency(),
+                        audioContext,
+                    ),
+                );
             }
             timerIntervalid = setInterval(() => {
                 elapsedTime = t.getElapsedTime() / 1000;
@@ -143,7 +155,6 @@
         }
     });
 
-    var midiNotes: PianoRollNote[] = [];
 </script>
 
 <div>
