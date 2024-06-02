@@ -120,8 +120,26 @@
     });
 
     var gridEle: HTMLElement;
+    var snapPoint: number;
+    onMount(() => {
+        snapPoint = gridEle.clientWidth;
+    });
+
     afterUpdate(() => {
-        gridEle.scrollLeft = timerPosX - gridEle.clientWidth / 2;
+        if (timerPosX == 0) {
+            gridEle.scrollLeft = 0;
+            snapPoint = gridEle.clientWidth;
+            return;
+        }
+        if (timerPosX > snapPoint) {
+            let closestMajorLine = majorLines.reduce((prev, curr) =>
+            snapPoint > curr
+                    ? curr
+                    : prev,
+            );
+            gridEle.scrollLeft = closestMajorLine - 1;
+            snapPoint = closestMajorLine - 1 + gridEle.clientWidth ;
+        }
     });
 </script>
 
@@ -255,7 +273,10 @@
         </div>
 
         <!--Grid-->
-        <div class="w-full overflow-auto scroll-smooth pb-4" bind:this={gridEle}>
+        <div
+            class="w-full overflow-auto scroll-smooth pb-4 z-0"
+            bind:this={gridEle}
+        >
             <div
                 class="z-1"
                 style="position: relative; height: {grid.totalHeight()}px; width: {grid.totalWidth(
