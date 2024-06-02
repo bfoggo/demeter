@@ -52,7 +52,10 @@ export class Note {
 }
 
 export function pianoColor(note: Note) {
-    if (note.name === NoteName.C || note.name === NoteName.D || note.name === NoteName.E || note.name === NoteName.F || note.name === NoteName.G || note.name === NoteName.A || note.name === NoteName.B) {
+    if (note.name === NoteName.C){
+        return "yellow";
+    }
+    if (note.name === NoteName.D || note.name === NoteName.E || note.name === NoteName.F || note.name === NoteName.G || note.name === NoteName.A || note.name === NoteName.B) {
         return "white";
     } else {
         return "black";

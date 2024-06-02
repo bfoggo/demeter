@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { afterUpdate, onMount } from "svelte";
     import { Note, pianoColor } from "../types/note";
 
     import Select from "flowbite-svelte/Select.svelte";
@@ -118,9 +118,15 @@
             }
         }
     });
+
+    var gridEle: HTMLElement;
+    afterUpdate(() => {
+        gridEle.scrollLeft = timerPosX - gridEle.clientWidth / 2;
+    });
 </script>
 
 <div>
+    <!--Menus-->
     <div class="inline-flex ml-2 bg-gray-100 mt-2 h-10">
         <div class="flex text-sm">
             <div
@@ -229,9 +235,10 @@
         </button>
     </div>
 
-    <div class="mt-1 flex ml-2">
+    <div class="mt-1 flex ml-2 py-2">
+        <!--Keyboard-->
         <div
-            class="keyboard"
+            class="grid"
             style="grid-template-rows: repeat({numKeys}, {keyHeight}px); margin-right: 5px;"
         >
             {#each reverseKeys as key, keyIndex}
@@ -246,80 +253,77 @@
                 </button>
             {/each}
         </div>
-        <div
-            class="gridBackground"
-            style="position: relative; height: {grid.totalHeight()}px; width: {grid.totalWidth(
-                timeSignature,
-            )}px"
-        >
+
+        <!--Grid-->
+        <div class="w-full overflow-auto scroll-smooth pb-4" bind:this={gridEle}>
             <div
-                class="bg-violet-300 opacity-30 h-full w-2 absolute top-0 left-0"
-                style="width: {timerPosX}px; z-index: 1;"
-            />
-            {#each majorLines as posX, i}
+                class="z-1"
+                style="position: relative; height: {grid.totalHeight()}px; width: {grid.totalWidth(
+                    timeSignature,
+                )}px;"
+            >
                 <div
-                    class="majorLine top-0"
-                    style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
-                ></div>
-            {/each}
-            {#each minorLines as posX, i}
-                <div
-                    class="minorLine top-0"
-                    style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px; z-index: -1;"
-                ></div>
-                {#each reverseKeys as key, keyIndex}
-                    <button
-                        type="button"
-                        class="hover:bg-gray-200"
-                        style="position: absolute; left: {posX}px; top: {keyIndex *
-                            keyHeight}px; height: {keyHeight}px; width: {divisionLength}px;
-                            "
-                        on:mousedown={() => playNote(key)}
-                    />
+                    class="bg-violet-300 opacity-30 h-full w-2 absolute top-0 left-0"
+                    style="width: {timerPosX}px; z-index: 1;"
+                />
+                {#each majorLines as posX, i}
+                    <div
+                        class="majorLine top-0"
+                        style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
+                    ></div>
                 {/each}
-            {/each}
-            {#each reverseKeys as key, keyIndex}
+                {#each minorLines as posX, i}
+                    <div
+                        class="minorLine top-0"
+                        style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px; z-index: -1;"
+                    ></div>
+                    {#each reverseKeys as key, keyIndex}
+                        <button
+                            type="button"
+                            class="hover:bg-gray-200"
+                            style="position: absolute; left: {posX}px; top: {keyIndex *
+                                keyHeight}px; height: {keyHeight}px; width: {divisionLength}px;
+                            "
+                            on:mousedown={() => playNote(key)}
+                        />
+                    {/each}
+                {/each}
+                {#each reverseKeys as key, keyIndex}
+                    <div
+                        class="minorLine"
+                        style="position: absolute; width: {grid.totalWidth(
+                            timeSignature,
+                        )}px; height: 1px; top: {keyIndex *
+                            keyHeight}px; z-index: -1;"
+                    ></div>
+                {/each}
                 <div
                     class="minorLine"
                     style="position: absolute; width: {grid.totalWidth(
                         timeSignature,
-                    )}px; height: 1px; top: {keyIndex *
-                        keyHeight}px; z-index: -1;"
+                    )}px; height: 1px; top: {grid.totalHeight()}px; z-index: -1;"
                 ></div>
-            {/each}
-            <div
-                class="minorLine"
-                style="position: absolute; width: {grid.totalWidth(
-                    timeSignature,
-                )}px; height: 1px; top: {grid.totalHeight()}px; z-index: -1;"
-            ></div>
-            {#each measureLines as posX, i}
-                <div
-                    class="measureLine top-0"
-                    style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX}px; z-index: 1;"
-                ></div>
-                <div
-                    class="measureLine top-0"
-                    style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX +
-                        3}px; z-index: 1;"
-                ></div>
-            {/each}
+                {#each measureLines as posX, i}
+                    <div
+                        class="measureLine top-0"
+                        style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX}px; z-index: 1;"
+                    ></div>
+                    <div
+                        class="measureLine top-0"
+                        style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX +
+                            3}px; z-index: 1;"
+                    ></div>
+                {/each}
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    .keyboard {
-        display: grid;
-    }
-
     .key {
         border: 1px solid #ccc;
         cursor: pointer;
         margin: 0;
-    }
-    .gridBackground {
-        z-index: 1;
     }
     .measureLine {
         background-color: #000000;
