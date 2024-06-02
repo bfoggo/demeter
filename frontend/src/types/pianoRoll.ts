@@ -162,12 +162,12 @@ export class TimeSignature {
 
 export class PianoRollNote {
     key: number;
-    startTime: number;
+    startPosX: number;
     duration: number;
 
     constructor(key: number, startTime: number, duration: number) {
         this.key = key;
-        this.startTime = startTime;
+        this.startPosX = startTime;
         this.duration = duration;
     }
 }

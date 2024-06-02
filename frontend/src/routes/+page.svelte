@@ -7,6 +7,7 @@
     import { readable, writable } from "svelte/store";
 
     import {
+        PianoRollNote,
         PianoRollGrid,
         TimeSignature,
         parseBeatPatternString,
@@ -141,6 +142,8 @@
             snapPoint = closestMajorLine - 1 + gridEle.clientWidth ;
         }
     });
+
+    var midiNotes: PianoRollNote[] = [];
 </script>
 
 <div>
@@ -299,13 +302,13 @@
                         style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px; z-index: -1;"
                     ></div>
                     {#each reverseKeys as key, keyIndex}
-                        <button
-                            type="button"
+                        <div role="button"
+                            tabindex="0"
                             class="hover:bg-gray-200"
                             style="position: absolute; left: {posX}px; top: {keyIndex *
                                 keyHeight}px; height: {keyHeight}px; width: {divisionLength}px;
                             "
-                            on:mousedown={() => playNote(key)}
+                            on:dblclick={() => {playNote(key); midiNotes.push({ key: keyIndex, startPosX: posX, duration: divisionLength }); midiNotes = midiNotes}}
                         />
                     {/each}
                 {/each}
@@ -327,12 +330,21 @@
                 {#each measureLines as posX, i}
                     <div
                         class="measureLine top-0"
-                        style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX}px; z-index: 1;"
+                        style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX-1.5}px; z-index: 1;"
                     ></div>
                     <div
                         class="measureLine top-0"
                         style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX +
-                            3}px; z-index: 1;"
+                            1.5}px; z-index: 1;"
+                    ></div>
+                {/each}
+                {#each midiNotes as midiNote}
+                    <div role="button"
+                        tabindex="-1"
+                        class="bg-gray-300 opacity-50 hover:bg-gray-400 border-2 border-black"
+                        style="position: absolute; left: {midiNote.startPosX}px; top: {midiNote.key *
+                            keyHeight}px; height: {keyHeight}px; width: {midiNote.duration}px;"
+                            on:dblclick={() => {midiNotes = midiNotes.filter((note) => note != midiNote)}}
                     ></div>
                 {/each}
             </div>
