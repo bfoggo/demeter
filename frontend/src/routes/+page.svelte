@@ -1,6 +1,6 @@
 <script lang="ts">
     import { afterUpdate, onMount } from "svelte";
-    import { Note, pianoColor } from "../types/note";
+    import { Note, pianoColor, pianoRollColor } from "../types/note";
 
     import Select from "flowbite-svelte/Select.svelte";
     import Input from "flowbite-svelte/Input.svelte";
@@ -341,8 +341,9 @@
                 {#each midiNotes as midiNote}
                     <div role="button"
                         tabindex="-1"
-                        class="bg-gray-300 opacity-50 hover:bg-gray-400 border-2 border-black"
-                        style="position: absolute; left: {midiNote.startPosX}px; top: {midiNote.key *
+                        class="opacity-50 hover:bg-gray-400 border-2 border-black"
+                        style="background: {pianoRollColor(keys[midiNote.key])};
+                        position: absolute; left: {midiNote.startPosX}px; top: {midiNote.key *
                             keyHeight}px; height: {keyHeight}px; width: {midiNote.duration}px;"
                             on:dblclick={() => {midiNotes = midiNotes.filter((note) => note != midiNote)}}
                     ></div>

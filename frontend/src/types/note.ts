@@ -61,3 +61,42 @@ export function pianoColor(note: Note) {
         return "black";
     }
 }
+
+export function pianoRollColor(note: Note) {
+    if (note.name === NoteName.B){
+        return "#FF0055";
+    }
+    if (note.name === NoteName.C){
+        return "#AA00FF";
+    }
+    if (note.name === NoteName.CSharp){
+        return "#0000FF";
+    }
+    if (note.name === NoteName.D){
+        return "#0055FF";
+    }
+    if (note.name === NoteName.DSharp){
+        return "#00AAFF";
+    }
+    if (note.name === NoteName.E){
+        return "#00FFD4";
+    }
+    if (note.name === NoteName.F){
+        return "#00FF55";
+    }
+    if (note.name === NoteName.FSharp){
+        return "#55FF00";
+    }
+    if (note.name === NoteName.G){
+        return "#AAFF00";
+    }
+    if (note.name === NoteName.GSharp){
+        return "#FFD400";
+    }
+    if (note.name === NoteName.A){
+        return "#FFAA00";
+    }
+    if (note.name === NoteName.ASharp){
+        return "#FF5500";
+    }
+}
