@@ -278,7 +278,6 @@ export class PianoRollGrid {
             gridLines.push(current);
             current += this.divisionLength(division, tuplet);
         }
-        gridLines.push(current);
         return gridLines;
     }
 
