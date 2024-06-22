@@ -1,7 +1,6 @@
 <script lang="ts">
     import type { Note } from "../types/note";
-    import type { HexString } from "../types/hexstring";
-
+    import type { HexString } from "../types/note";
     export let keys: Note[];
     export let keyHeight: number;
     export let width: number;

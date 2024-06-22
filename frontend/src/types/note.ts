@@ -1,4 +1,3 @@
-import type { HexString } from "./hexstring";
 
 export enum NoteName {
     C = 0,
@@ -103,3 +102,4 @@ export function pianoRollColor(note: Note): HexString {
     }
     throw new Error("Invalid note");
 }
+export type HexString = String;

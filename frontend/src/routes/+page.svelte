@@ -1,16 +1,13 @@
 <script lang="ts">
     import { afterUpdate, onMount } from "svelte";
-    import { Note, pianoColor, pianoRollColor } from "../types/note";
+    import { Note, pianoRollColor } from "../types/note";
     import { MusicContext } from "../types/context";
     import Keyboard from "../components/keyboard.svelte";
-    import { readable, writable } from "svelte/store";
+    import { writable } from "svelte/store";
     import MusicSettings from "../components/musicsettings.svelte";
     import {
         PianoRollNote,
         PianoRollGrid,
-        TimeSignature,
-        allDivisions,
-        allTuplets,
     } from "../types/pianoRoll";
     import { PlaybackTimer } from "../types/playback";
     import { kickSound, highHatSound, noteSound } from "../types/sounds";
