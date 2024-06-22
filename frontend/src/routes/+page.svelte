@@ -28,10 +28,6 @@
 
     $: grid = new PianoRollGrid($musicContext, keyHeight, eighthNoteWidth);
     $: reverseKeys = $musicContext.keys().slice().reverse();
-    $: majorLines = grid.majorLinesPosX();
-    $: minorLines = grid.minorLinesPosX();
-    $: measureLines = grid.measureLinesPosX();
-    $: divisionLength = grid.divisionLength();
 
     var midiNotes: PianoRollNote[] = [];
 
@@ -63,11 +59,11 @@
     timer.subscribe((t) => {
         if (t.playing) {
             stoppables = [];
-            for (var majorLine of majorLines) {
+            for (var majorLine of grid.majorLinesPosX()) {
                 let time_at_major_line = grid.posXToTime(majorLine);
                 stoppables.push(kickSound(time_at_major_line, audioContext));
             }
-            for (var minorLine of minorLines) {
+            for (var minorLine of grid.minorLinesPosX()) {
                 let time_at_minor_line = grid.posXToTime(minorLine);
                 stoppables.push(highHatSound(time_at_minor_line, audioContext));
             }
@@ -116,7 +112,7 @@
             return;
         }
         if (timerPosX > snapPoint) {
-            let closestMajorLine = majorLines.reduce((prev, curr) =>
+            let closestMajorLine = grid.majorLinesPosX().reduce((prev, curr) =>
                 snapPoint > curr ? curr : prev,
             );
             gridEle.scrollLeft = closestMajorLine - 1;
@@ -148,13 +144,13 @@
                     class="bg-violet-300 opacity-30 h-full w-2 absolute top-0 left-0"
                     style="width: {timerPosX}px; z-index: 1;"
                 />
-                {#each majorLines as posX, i}
+                {#each grid.majorLinesPosX() as posX, i}
                     <div
                         class="majorLine top-0"
                         style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
                     ></div>
                 {/each}
-                {#each minorLines as posX, i}
+                {#each grid.minorLinesPosX() as posX, i}
                     <div
                         class="minorLine top-0"
                         style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px; z-index: -1;"
@@ -165,14 +161,14 @@
                             tabindex="0"
                             class="hover:bg-gray-200"
                             style="position: absolute; left: {posX}px; top: {keyIndex *
-                                keyHeight}px; height: {keyHeight}px; width: {divisionLength}px;
+                                keyHeight}px; height: {keyHeight}px; width: {grid.divisionLength()}px;
                             "
                             on:dblclick={() => {
                                 playNote(key);
                                 midiNotes.push({
                                     key: keyIndex,
                                     startPosX: posX,
-                                    duration: divisionLength,
+                                    duration: grid.divisionLength(),
                                 });
                                 midiNotes = midiNotes;
                             }}
@@ -190,7 +186,7 @@
                     class="minorLine"
                     style="position: absolute; width: {grid.totalWidth()}px; height: 1px; top: {grid.totalHeight()}px; z-index: -1;"
                 ></div>
-                {#each measureLines as posX, i}
+                {#each grid.measureLinesPosX() as posX, i}
                     <div
                         class="measureLine top-0"
                         style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX -
