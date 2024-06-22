@@ -1,3 +1,5 @@
+import type { HexString } from "./hexstring";
+
 export enum NoteName {
     C = 0,
     CSharp = 1,
@@ -62,7 +64,7 @@ export function pianoColor(note: Note) {
     }
 }
 
-export function pianoRollColor(note: Note) {
+export function pianoRollColor(note: Note): HexString {
     if (note.name === NoteName.B){
         return "#FF0055";
     }
@@ -99,4 +101,5 @@ export function pianoRollColor(note: Note) {
     if (note.name === NoteName.ASharp){
         return "#FF5500";
     }
+    throw new Error("Invalid note");
 }

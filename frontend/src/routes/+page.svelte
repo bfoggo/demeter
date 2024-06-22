@@ -2,9 +2,7 @@
     import { afterUpdate, onMount } from "svelte";
     import { Note, pianoColor, pianoRollColor } from "../types/note";
     import { MusicContext } from "../types/context";
-
-    import Select from "flowbite-svelte/Select.svelte";
-    import Input from "flowbite-svelte/Input.svelte";
+    import Keyboard from "../components/keyboard.svelte";
     import { readable, writable } from "svelte/store";
     import MusicSettings from "../components/musicsettings.svelte";
     import {
@@ -130,26 +128,7 @@
 <MusicSettings {musicContext} />
 
 <div class="mt-1 flex ml-2 py-2">
-    <!--Keyboard-->
-    <div
-        class="grid"
-        style="grid-template-rows: repeat({$musicContext.keys()
-            .length}, {keyHeight}px); margin-right: 5px;"
-    >
-        {#each reverseKeys as key, keyIndex}
-            <button
-                type="button"
-                class="key"
-                style="height: {keyHeight}px; width: 30px; background-color: {pianoColor(
-                    key,
-                )}"
-                on:mousedown={() => playNote(key)}
-            >
-            </button>
-        {/each}
-    </div>
-
-    <!--Grid-->
+    <Keyboard keys={$musicContext.keys()} keyHeight={keyHeight} width={30} playNote={playNote} noteColors={pianoRollColor} />
     <div
         class="w-full overflow-auto scroll-smooth pb-4 z-0"
         bind:this={gridEle}
@@ -264,11 +243,6 @@
 </button>
 
 <style>
-    .key {
-        border: 1px solid #ccc;
-        cursor: pointer;
-        margin: 0;
-    }
     .measureLine {
         background-color: #000000;
     }
