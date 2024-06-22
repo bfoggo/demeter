@@ -1,3 +1,4 @@
+import type { MusicContext } from "./context";
 import type { Note } from "./note";
 
 export enum TimeSignatureDenominator {
@@ -14,7 +15,7 @@ export enum Division {
     Whole = "Whole",
     Half = "Half",
     Quarter = "Quarter",
-    Eighth  = "Eighth",
+    Eighth = "Eighth",
     Sixteenth = "Sixteenth",
     ThirtySecond = "ThirtySecond",
 }
@@ -35,7 +36,7 @@ export function allTuplets(): Tuplet[] {
     return [Tuplet.None, Tuplet.Triplet, Tuplet.Quintuplet, Tuplet.Septuplet, Tuplet.Nonuplet];
 }
 
-type ComplexityPattern = BeatComplexity[];
+export type ComplexityPattern = BeatComplexity[];
 
 
 export function beatPatternStr(pattern: ComplexityPattern): string {
@@ -100,15 +101,16 @@ export class TimeSignature {
         this.denominator = denominator;
     }
 
-    complexityPatterns(): ComplexityPattern[] {
+    complexityPatterns(): string[] {
         switch (this.denominator) {
             case TimeSignatureDenominator.Quarter:
-                return [Array.from({ length: this.numerator }, () => BeatComplexity.Simple)] as ComplexityPattern[];
+                return [Array.from({ length: this.numerator }, () => BeatComplexity.Simple)].map(pattern=>beatPatternStr(pattern));
             case TimeSignatureDenominator.Eighth:
-                var results: ComplexityPattern[] = []
+                var results: string[] = []
                 for (const twoThree of twosAndThreesSummingToN(this.numerator)) {
                     const pattern = Array.from({ length: twoThree.twos }, () => BeatComplexity.Simple).concat(Array.from({ length: twoThree.threes }, () => BeatComplexity.Compound));
-                    results.push(...distinguishablePermutations(pattern) as ComplexityPattern[]);
+                    let permutations = distinguishablePermutations(pattern) as ComplexityPattern[];
+                    results.push(...permutations.map(pattern => beatPatternStr(pattern)));
                 }
                 return results;
         }
@@ -121,7 +123,7 @@ export class TimeSignature {
                 numDivisions = this.numerator / this.denominator;
                 break;
             case Division.Half:
-                numDivisions =  2 * this.numerator / this.denominator;
+                numDivisions = 2 * this.numerator / this.denominator;
                 break
             case Division.Quarter:
                 numDivisions = 4 * this.numerator / this.denominator;
@@ -173,50 +175,44 @@ export class PianoRollNote {
 }
 
 export class PianoRollGrid {
-    measures: number;
-    numKeys: number;
+    musicContext: MusicContext;
     keyHeight: number;
     eighthNoteWidth: number;
     notes: PianoRollNote[];
 
-    constructor(measures: number, numKeys: number, keyHeight: number, eighthNoteWidth: number) {
-        this.measures = measures;
-        this.numKeys = numKeys;
+    constructor(musicContext: MusicContext, keyHeight: number, eighthNoteWidth: number) {
+        this.musicContext = musicContext;
         this.keyHeight = keyHeight;
         this.eighthNoteWidth = eighthNoteWidth;
         this.notes = [];
     }
 
-    setMeasures(measures: number) {
-        this.measures = measures;
-    }
-
-    measureWidth(timeSignature: TimeSignature): number {
-        switch (timeSignature.denominator) {
+    measureWidth(): number {
+        switch (this.musicContext.timeSignature.denominator) {
             case TimeSignatureDenominator.Quarter:
-                return timeSignature.numerator * 2 * this.eighthNoteWidth;
+                return this.musicContext.timeSignature.numerator * 2 * this.eighthNoteWidth;
             case TimeSignatureDenominator.Eighth:
-                return timeSignature.numerator * this.eighthNoteWidth;
+                return this.musicContext.timeSignature.numerator * this.eighthNoteWidth;
         }
     }
 
-    totalWidth(timeSignature: TimeSignature): number {
-        switch (timeSignature.denominator) {
+    totalWidth(): number {
+        switch (this.musicContext.timeSignature.denominator) {
             case TimeSignatureDenominator.Quarter:
-                return this.measures * timeSignature.numerator * 2 * this.eighthNoteWidth;
+                return this.musicContext.measures * this.musicContext.timeSignature.numerator * 2 * this.eighthNoteWidth;
             case TimeSignatureDenominator.Eighth:
-                return this.measures * timeSignature.numerator * this.eighthNoteWidth;
+                return this.musicContext.measures * this.musicContext.timeSignature.numerator * this.eighthNoteWidth;
         }
     }
 
     totalHeight(): number {
-        return this.numKeys * this.keyHeight;
+        return this.musicContext.keys().length * this.keyHeight;
     }
 
-    majorLinesPosX(timeSignature: TimeSignature, complexityPattern: ComplexityPattern): number[] {
+    majorLinesPosX(): number[] {
         var gridLines: number[] = [];
         let current = 0;
-        for (const complexity of complexityPattern) {
+        for (const complexity of parseBeatPatternString(this.musicContext.complexityPatternStr)) {
             gridLines.push(current);
             if (complexity === BeatComplexity.Simple) {
                 current += 2 * this.eighthNoteWidth;
@@ -225,13 +221,15 @@ export class PianoRollGrid {
             }
         }
         gridLines.push(current);
-        let gridLinesAllMeasures = Array.from({ length: this.measures }, (_, i) => i).map(i => gridLines.slice(0, gridLines.length - 1).map(l => l + i * this.measureWidth(timeSignature))).flat();
+        let gridLinesAllMeasures = Array.from({ length: this.musicContext.measures }, (_, i) => i)
+            .map(i => gridLines.slice(0, gridLines.length - 1).map(l => l + i * this.measureWidth()))
+            .flat();
         return gridLinesAllMeasures;
     }
 
-    divisionLength(division: Division, tuplet: Tuplet): number {
+    divisionLength(): number {
         let divisionLength = this.eighthNoteWidth;
-        switch (division) {
+        switch (this.musicContext.division) {
             case Division.Whole:
                 divisionLength *= 8;
                 break;
@@ -251,7 +249,7 @@ export class PianoRollGrid {
                 divisionLength /= 4;
                 break;
         }
-        switch (tuplet) {
+        switch (this.musicContext.tuplet) {
             case Tuplet.None:
                 divisionLength *= 1;
                 break;
@@ -271,20 +269,21 @@ export class PianoRollGrid {
         return divisionLength;
     }
 
-    minorLinesPosX(timeSignature: TimeSignature, division: Division, tuplet: Tuplet): number[] {
+    minorLinesPosX(): number[] {
         const gridLines = [];
         let current = 0;
-        for (let i = 0; i < this.measures * timeSignature.numDivisionsPerMeasure(division, tuplet); i++) {
+        for (let i = 0; i < this.musicContext.measures * this.musicContext.timeSignature.numDivisionsPerMeasure(this.musicContext.division, this.musicContext.tuplet); i++) {
             gridLines.push(current);
-            current += this.divisionLength(division, tuplet);
+            current += this.divisionLength();
         }
         return gridLines;
     }
 
-    measureLinesPosX(timeSignature: TimeSignature): number[] {
+    measureLinesPosX(): number[] {
+        const timeSignature = this.musicContext.timeSignature;
         const gridLines = [];
         let current = 0;
-        for (let i = 0; i < this.measures; i++) {
+        for (let i = 0; i < this.musicContext.measures; i++) {
             gridLines.push(current);
             current += timeSignature.denominator === TimeSignatureDenominator.Quarter ? timeSignature.numerator * 2 * this.eighthNoteWidth : timeSignature.numerator * this.eighthNoteWidth;
         }
@@ -292,12 +291,12 @@ export class PianoRollGrid {
         return gridLines;
     }
 
-    posXToTime(posX: number, bpm: number): number {
-        return posX / this.eighthNoteWidth / 2 * 60 / bpm;
+    posXToTime(posX: number): number {
+        return posX / this.eighthNoteWidth / 2 * 60 / this.musicContext.bpm;
     }
 
-    timeToPosX(time: number, bpm: number): number {
-        return time / 60 * bpm  * (this.eighthNoteWidth * 2);
+    timeToPosX(time: number): number {
+        return time / 60 * this.musicContext.bpm * (this.eighthNoteWidth * 2);
     }
 
     keyToPosY(key: number): number {
