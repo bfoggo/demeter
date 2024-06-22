@@ -125,93 +125,101 @@
     });
 </script>
 
-<MusicSettings {musicContext} />
+<div class="divide-y-2">
+    <MusicSettings {musicContext} />
 
-<div class="mt-1 flex ml-2 py-2">
-    <Keyboard keys={$musicContext.keys()} keyHeight={keyHeight} width={30} playNote={playNote} noteColors={pianoRollColor} />
-    <div
-        class="w-full overflow-auto scroll-smooth pb-4 z-0"
-        bind:this={gridEle}
-    >
+    <div class="mt-1 flex ml-2 py-2">
+        <Keyboard
+            keys={$musicContext.keys()}
+            {keyHeight}
+            width={30}
+            {playNote}
+            noteColors={pianoRollColor}
+        />
         <div
-            class="z-1"
-            style="position: relative; height: {grid.totalHeight()}px; width: {grid.totalWidth()}px;"
+            class="w-full overflow-auto scroll-smooth pb-4 z-0"
+            bind:this={gridEle}
         >
             <div
-                class="bg-violet-300 opacity-30 h-full w-2 absolute top-0 left-0"
-                style="width: {timerPosX}px; z-index: 1;"
-            />
-            {#each majorLines as posX, i}
+                class="z-1"
+                style="position: relative; height: {grid.totalHeight()}px; width: {grid.totalWidth()}px;"
+            >
                 <div
-                    class="majorLine top-0"
-                    style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
-                ></div>
-            {/each}
-            {#each minorLines as posX, i}
-                <div
-                    class="minorLine top-0"
-                    style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px; z-index: -1;"
-                ></div>
+                    class="bg-violet-300 opacity-30 h-full w-2 absolute top-0 left-0"
+                    style="width: {timerPosX}px; z-index: 1;"
+                />
+                {#each majorLines as posX, i}
+                    <div
+                        class="majorLine top-0"
+                        style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
+                    ></div>
+                {/each}
+                {#each minorLines as posX, i}
+                    <div
+                        class="minorLine top-0"
+                        style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px; z-index: -1;"
+                    ></div>
+                    {#each reverseKeys as key, keyIndex}
+                        <div
+                            role="button"
+                            tabindex="0"
+                            class="hover:bg-gray-200"
+                            style="position: absolute; left: {posX}px; top: {keyIndex *
+                                keyHeight}px; height: {keyHeight}px; width: {divisionLength}px;
+                            "
+                            on:dblclick={() => {
+                                playNote(key);
+                                midiNotes.push({
+                                    key: keyIndex,
+                                    startPosX: posX,
+                                    duration: divisionLength,
+                                });
+                                midiNotes = midiNotes;
+                            }}
+                        />
+                    {/each}
+                {/each}
                 {#each reverseKeys as key, keyIndex}
                     <div
-                        role="button"
-                        tabindex="0"
-                        class="hover:bg-gray-200"
-                        style="position: absolute; left: {posX}px; top: {keyIndex *
-                            keyHeight}px; height: {keyHeight}px; width: {divisionLength}px;
-                            "
-                        on:dblclick={() => {
-                            playNote(key);
-                            midiNotes.push({
-                                key: keyIndex,
-                                startPosX: posX,
-                                duration: divisionLength,
-                            });
-                            midiNotes = midiNotes;
-                        }}
-                    />
+                        class="minorLine"
+                        style="position: absolute; width: {grid.totalWidth()}px; height: 1px; top: {keyIndex *
+                            keyHeight}px; z-index: -1;"
+                    ></div>
                 {/each}
-            {/each}
-            {#each reverseKeys as key, keyIndex}
                 <div
                     class="minorLine"
-                    style="position: absolute; width: {grid.totalWidth()}px; height: 1px; top: {keyIndex *
-                        keyHeight}px; z-index: -1;"
+                    style="position: absolute; width: {grid.totalWidth()}px; height: 1px; top: {grid.totalHeight()}px; z-index: -1;"
                 ></div>
-            {/each}
-            <div
-                class="minorLine"
-                style="position: absolute; width: {grid.totalWidth()}px; height: 1px; top: {grid.totalHeight()}px; z-index: -1;"
-            ></div>
-            {#each measureLines as posX, i}
-                <div
-                    class="measureLine top-0"
-                    style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX -
-                        1.5}px; z-index: 1;"
-                ></div>
-                <div
-                    class="measureLine top-0"
-                    style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX +
-                        1.5}px; z-index: 1;"
-                ></div>
-            {/each}
-            {#each midiNotes as midiNote}
-                <div
-                    role="button"
-                    tabindex="-1"
-                    class="opacity-50 hover:bg-gray-400 border-2 border-black"
-                    style="background: {pianoRollColor(
-                        $musicContext.keys()[midiNote.key],
-                    )};
+                {#each measureLines as posX, i}
+                    <div
+                        class="measureLine top-0"
+                        style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX -
+                            1.5}px; z-index: 1;"
+                    ></div>
+                    <div
+                        class="measureLine top-0"
+                        style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX +
+                            1.5}px; z-index: 1;"
+                    ></div>
+                {/each}
+                {#each midiNotes as midiNote}
+                    <div
+                        role="button"
+                        tabindex="-1"
+                        class="opacity-50 hover:bg-gray-400 border-2 border-black"
+                        style="background: {pianoRollColor(
+                            $musicContext.keys()[midiNote.key],
+                        )};
                         position: absolute; left: {midiNote.startPosX}px; top: {midiNote.key *
-                        keyHeight}px; height: {keyHeight}px; width: {midiNote.duration}px;"
-                    on:dblclick={() => {
-                        midiNotes = midiNotes.filter(
-                            (note) => note != midiNote,
-                        );
-                    }}
-                ></div>
-            {/each}
+                            keyHeight}px; height: {keyHeight}px; width: {midiNote.duration}px;"
+                        on:dblclick={() => {
+                            midiNotes = midiNotes.filter(
+                                (note) => note != midiNote,
+                            );
+                        }}
+                    ></div>
+                {/each}
+            </div>
         </div>
     </div>
 </div>
