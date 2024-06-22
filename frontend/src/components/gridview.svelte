@@ -16,8 +16,16 @@
 
     var gridEle: HTMLElement;
     var snapPoint: number;
+
     onMount(() => {
         snapPoint = gridEle.clientWidth;
+        playbackTimer.subscribe((t) => {
+            if (!t.playing) {
+                gridEle.scrollLeft = 0;
+                snapPoint = gridEle.clientWidth;
+                return;
+            }
+        });
     });
 
     let elapsedTime: number = 0;
@@ -26,18 +34,16 @@
     let gridUpdateIntervalid = setInterval(() => {
         elapsedTime = $playbackTimer.getElapsedSeconds();
         timerX = grid.timeToPosX(elapsedTime);
-    })
+    });
 
     afterUpdate(() => {
-        if (timerX == 0) {
-            gridEle.scrollLeft = 0;
-            snapPoint = gridEle.clientWidth;
+        if (!$playbackTimer.playing) {
             return;
         }
         if (timerX > snapPoint) {
-            let closestMajorLine = grid.majorLinesPosX().reduce((prev, curr) =>
-                snapPoint > curr ? curr : prev,
-            );
+            let closestMajorLine = grid
+                .majorLinesPosX()
+                .reduce((prev, curr) => (snapPoint > curr ? curr : prev));
             gridEle.scrollLeft = closestMajorLine - 1;
             snapPoint = closestMajorLine - 1 + gridEle.clientWidth;
         }
