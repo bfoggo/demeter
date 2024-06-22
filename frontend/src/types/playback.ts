@@ -18,9 +18,9 @@ export class PlaybackTimer {
         this.playing = false;
     }
 
-    getElapsedTime() {
+    getElapsedSeconds() {
         if (this.playing) {
-            return new Date().getTime() - this.startTime.getTime();
+            return (new Date().getTime() - this.startTime.getTime()) / 1000;
         }
         return 0;
     }
