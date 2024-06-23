@@ -131,10 +131,8 @@
             {grid}
             playbackTimer={timer}
             {midiNotes}
-            {musicContext}
             playNote={playNoteThrottled}
             {reverseKeys}
-            {pianoRollColor}
         />
     </div>
 </div>

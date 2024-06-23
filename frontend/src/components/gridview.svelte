@@ -4,15 +4,14 @@
     import type { PlaybackTimer } from "../types/playback";
     import type { HexString, Note } from "../types/note";
     import type { Writable } from "svelte/store";
-    import type { MusicContext } from "../types/context";
+    import MidiNotesView from "./midinotesview.svelte";
+    import { pianoRollColor } from "../types/note";
 
-    export let musicContext: Writable<MusicContext>;
     export let grid: PianoRollGrid;
     export let playbackTimer: Writable<PlaybackTimer>;
     export let reverseKeys: Note[];
     export let playNote: (note: Note) => void;
     export let midiNotes: Writable<Set<PianoRollNote>>;
-    export let pianoRollColor: (note: Note) => HexString;
 
     var gridEle: HTMLElement;
     var snapPoint: number;
@@ -48,8 +47,6 @@
             snapPoint = closestMajorLine - 1 + gridEle.clientWidth;
         }
     });
-
-    
 </script>
 
 <div class="w-full overflow-auto scroll-smooth pb-4 z-0" bind:this={gridEle}>
@@ -115,31 +112,13 @@
                     1.5}px; z-index: 1;"
             ></div>
         {/each}
-        {#each $midiNotes as midiNote}
-            <div
-                role="button"
-                tabindex="-1"
-                class="opacity-50 hover:bg-gray-400 border-2 border-black"
-                style="background: {pianoRollColor(
-                    $musicContext.keys()[midiNote.key],
-                )};
-                        position: absolute; left: {midiNote.startPosX}px; top: {midiNote.key *
-                    grid.keyHeight}px; height: {grid.keyHeight}px; width: {midiNote.duration}px;"
-                on:dblclick={() => {
-                    $midiNotes.delete(midiNote);
-                    midiNotes = midiNotes;
-                }}
-                on:click={() => {
-                    playNote(reverseKeys[midiNote.key]);
-                }}
-                on:keydown={(e) => {
-                    if (e.key === "Delete") {
-                        $midiNotes.delete(midiNote);
-                        midiNotes = midiNotes;
-                    }
-                }}
-            ></div>
-        {/each}
+        <MidiNotesView
+            {pianoRollColor}
+            {midiNotes}
+            {grid}
+            {reverseKeys}
+            {playNote}
+        />
     </div>
 </div>
 
