@@ -26,8 +26,21 @@
 
     var midiNotes: Writable<Set<PianoRollNote>> = writable(new Set());
 
+
     function playNote(note: Note) {
         noteSound(0.0, note.frequency(), audioContext);
+    }
+    var playbackTimeouts: Set<Note> = new Set();
+    function playNoteThrottled(note: Note) {
+        console.log(playbackTimeouts)
+        if (playbackTimeouts.has(note)) {
+            return;
+        }
+        playNote(note);
+        playbackTimeouts.add(note);
+        let timeoutId = setTimeout(() => {
+            playbackTimeouts.delete(note);
+        }, 200);
     }
 
     function startTimer() {
@@ -111,7 +124,7 @@
             keys={$musicContext.keys()}
             {keyHeight}
             width={30}
-            {playNote}
+            playNote={playNoteThrottled}
             noteColors={pianoRollColor}
         />
         <GridVeiw
@@ -119,7 +132,7 @@
             playbackTimer={timer}
             {midiNotes}
             {musicContext}
-            {playNote}
+            playNote={playNoteThrottled}
             {reverseKeys}
             {pianoRollColor}
         />

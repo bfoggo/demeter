@@ -48,6 +48,8 @@
             snapPoint = closestMajorLine - 1 + gridEle.clientWidth;
         }
     });
+
+    
 </script>
 
 <div class="w-full overflow-auto scroll-smooth pb-4 z-0" bind:this={gridEle}>
@@ -126,6 +128,15 @@
                 on:dblclick={() => {
                     $midiNotes.delete(midiNote);
                     midiNotes = midiNotes;
+                }}
+                on:click={() => {
+                    playNote(reverseKeys[midiNote.key]);
+                }}
+                on:keydown={(e) => {
+                    if (e.key === "Delete") {
+                        $midiNotes.delete(midiNote);
+                        midiNotes = midiNotes;
+                    }
                 }}
             ></div>
         {/each}
