@@ -93,6 +93,14 @@
             }
         }
     });
+
+    function handlePlayClick() {
+        if ($timer.playing) {
+            stopTimer();
+        } else {
+            startTimer();
+        }
+    }
 </script>
 
 <div class="divide-y-2">
@@ -121,25 +129,30 @@
     type="button"
     class="flex items-center jusitfy-center border-2 border-gray-200 hover:bg-gray-200 border-r-0 border-t-0 border-b-0 px-2"
     on:click={() => {
-        stopTimer();
-        startTimer();
+        handlePlayClick();
     }}
->
-    <svg
-        class="w-6 h-6 text-gray-800 dark:text-white"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        fill="none"
-        viewBox="0 0 24 24"
-    >
-        <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M8 16.881V7.119a1 1 0 0 1 1.636-.772l5.927 4.881a1 1 0 0 1 0 1.544l-5.927 4.88A1 1 0 0 1 8 16.882Z"
-        />
-    </svg>
+    >{#if !$timer.playing}
+        <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path
+                d="M3 3.73241C3 2.54878 4.30673 1.83146 5.30531 2.46692L12.0114 6.73441C12.9376 7.32384 12.9376 8.67597 12.0114 9.2654L5.30532 13.5329C4.30673 14.1684 3 13.451 3 12.2674V3.73241Z"
+                fill="black"
+            />
+        </svg>
+    {:else}
+        <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <rect x="3" y="3" width="10" height="10" rx="1.5" fill="black" />
+        </svg>
+    {/if}
 </button>
