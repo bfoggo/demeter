@@ -3,7 +3,7 @@
     import { Note, pianoRollColor } from "../types/note";
     import { MusicContext } from "../types/context";
     import Keyboard from "../components/keyboard.svelte";
-    import { writable } from "svelte/store";
+    import { writable, type Writable } from "svelte/store";
     import MusicSettings from "../components/musicsettings.svelte";
     import GridVeiw from "../components/gridview.svelte";
     import { PianoRollNote, PianoRollGrid } from "../types/pianoRoll";
@@ -24,7 +24,7 @@
     $: grid = new PianoRollGrid($musicContext, keyHeight, eighthNoteWidth);
     $: reverseKeys = $musicContext.keys().slice().reverse();
 
-    var midiNotes: PianoRollNote[] = [];
+    var midiNotes: Writable<Set<PianoRollNote>> = writable(new Set());
 
     function playNote(note: Note) {
         noteSound(0.0, note.frequency(), audioContext);
@@ -62,7 +62,7 @@
                 let time_at_minor_line = grid.posXToTime(minorLine);
                 stoppables.push(highHatSound(time_at_minor_line, audioContext));
             }
-            for (var midiNote of midiNotes) {
+            for (var midiNote of $midiNotes) {
                 let time_at_midi_note = grid.posXToTime(midiNote.startPosX);
                 stoppables.push(
                     noteSound(

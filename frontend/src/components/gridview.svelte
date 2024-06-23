@@ -11,7 +11,7 @@
     export let playbackTimer: Writable<PlaybackTimer>;
     export let reverseKeys: Note[];
     export let playNote: (note: Note) => void;
-    export let midiNotes: PianoRollNote[];
+    export let midiNotes: Writable<Set<PianoRollNote>>;
     export let pianoRollColor: (note: Note) => HexString;
 
     var gridEle: HTMLElement;
@@ -80,7 +80,7 @@
                             "
                     on:dblclick={() => {
                         playNote(key);
-                        midiNotes.push({
+                        $midiNotes.add({
                             key: keyIndex,
                             startPosX: posX,
                             duration: grid.divisionLength(),
@@ -113,7 +113,7 @@
                     1.5}px; z-index: 1;"
             ></div>
         {/each}
-        {#each midiNotes as midiNote}
+        {#each $midiNotes as midiNote}
             <div
                 role="button"
                 tabindex="-1"
@@ -124,7 +124,8 @@
                         position: absolute; left: {midiNote.startPosX}px; top: {midiNote.key *
                     grid.keyHeight}px; height: {grid.keyHeight}px; width: {midiNote.duration}px;"
                 on:dblclick={() => {
-                    midiNotes = midiNotes.filter((note) => note != midiNote);
+                    $midiNotes.delete(midiNote);
+                    midiNotes = midiNotes;
                 }}
             ></div>
         {/each}
