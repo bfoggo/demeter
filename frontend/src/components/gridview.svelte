@@ -72,6 +72,7 @@
             {#each reverseKeys as key, keyIndex}
                 <div
                     role="button"
+                    draggable="false"
                     tabindex="0"
                     class="hover:bg-gray-200"
                     style="position: absolute; left: {posX}px; top: {keyIndex *
@@ -82,9 +83,13 @@
                         $midiNotes.add({
                             key: keyIndex,
                             startPosX: posX,
+                            startPosY: keyIndex * grid.keyHeight,
                             duration: grid.divisionLength(),
                         });
                         midiNotes = midiNotes;
+                    }}
+                    on:dragover={(e) => {
+                        e.preventDefault();
                     }}
                 />
             {/each}

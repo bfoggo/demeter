@@ -32,7 +32,6 @@
     }
     var playbackTimeouts: Set<Note> = new Set();
     function playNoteThrottled(note: Note) {
-        console.log(playbackTimeouts)
         if (playbackTimeouts.has(note)) {
             return;
         }
