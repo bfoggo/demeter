@@ -12,12 +12,39 @@
     var startX: number;
     var startY: number;
 
-    function leftMinorLine(posX: number): number {
-        return Math.floor(posX / grid.divisionLength());
+    function minorLineAt(posX: number): number {
+        if (posX < 0) {
+            return 0;
+        }
+        let left = Math.floor(posX / grid.divisionLength());
+        let right = Math.ceil(posX / grid.divisionLength());
+        if (left === right) {
+            return left;
+        }
+        if (
+            Math.abs(left * grid.divisionLength() - posX) <
+            Math.abs(right * grid.divisionLength() - posX)
+        ) {
+            return left;
+        }
+        return right;
     }
     function keyAt(posY: number): number {
-        console.log(posY, posY / grid.keyHeight);
-        return  Math.floor(posY / grid.keyHeight);
+        if (posY < 0) {
+            return 0;
+        }
+        let above = Math.floor(posY / grid.keyHeight);
+        let below = Math.ceil(posY / grid.keyHeight);
+        if (above === below) {
+            return above;
+        }
+        if (
+            Math.abs(above * grid.keyHeight - posY) <
+            Math.abs(below * grid.keyHeight - posY)
+        ) {
+            return above;
+        }
+        return below;
     }
 
     var currentElement: HTMLElement;
@@ -48,25 +75,27 @@
                 }
             }}
             on:dragstart={(e) => {
-                console.log(midiNote)
+                console.log(midiNote);
                 startX = e.clientX;
                 startY = e.clientY;
+            }}
+            on:dragover={(e) => {
+                e.preventDefault();
             }}
             on:dragend={(e) => {
                 e.preventDefault();
                 let deltaX = e.clientX - startX;
                 let deltaY = e.clientY - startY;
                 console.log(deltaX, deltaY);
-                let leftLine = leftMinorLine(midiNote.startPosX + deltaX);
-                let key = keyAt(
-                    midiNote.startPosY + deltaY
-                );
+                let leftLine = minorLineAt(midiNote.startPosX + deltaX);
+                let key = keyAt(midiNote.startPosY + deltaY);
                 midiNote.startPosX = leftLine * grid.divisionLength();
                 midiNote.key = key;
                 midiNote.startPosY = key * grid.keyHeight;
                 midiNotes = midiNotes;
                 startX = 0;
                 startY = 0;
+                playNote(reverseKeys[key])
             }}
         ></div>
     {/each}
