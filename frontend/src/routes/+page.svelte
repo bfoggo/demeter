@@ -39,7 +39,7 @@
         playbackTimeouts.add(note);
         let timeoutId = setTimeout(() => {
             playbackTimeouts.delete(note);
-        }, 200);
+        }, 500);
     }
 
     function startTimer() {

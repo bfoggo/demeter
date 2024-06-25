@@ -48,6 +48,7 @@
     }
 
     var currentElement: HTMLElement;
+    var colorCheckInterval: number;
 </script>
 
 <div>
@@ -78,15 +79,19 @@
                 console.log(midiNote);
                 startX = e.clientX;
                 startY = e.clientY;
+                if (e.target instanceof HTMLElement) {
+                    currentElement = e.target;
+                    currentElement.style.backgroundColor = "#E5E7EB";
+                }
             }}
             on:dragover={(e) => {
                 e.preventDefault();
             }}
             on:dragend={(e) => {
                 e.preventDefault();
+                clearInterval(colorCheckInterval);
                 let deltaX = e.clientX - startX;
                 let deltaY = e.clientY - startY;
-                console.log(deltaX, deltaY);
                 let leftLine = minorLineAt(midiNote.startPosX + deltaX);
                 let key = keyAt(midiNote.startPosY + deltaY);
                 midiNote.startPosX = leftLine * grid.divisionLength();

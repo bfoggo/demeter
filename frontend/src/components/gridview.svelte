@@ -90,6 +90,21 @@
                     }}
                     on:dragover={(e) => {
                         e.preventDefault();
+                        if (e.target instanceof HTMLElement) {
+                            e.target.style.backgroundColor = "#E5E7EB";
+                            playNote(reverseKeys[keyIndex]);
+                        }
+                    }}
+                    on:dragleave={(e) => {
+                        if (e.target instanceof HTMLElement) {
+                            e.target.style.backgroundColor = "";
+                        }
+                    }}
+                    on:drop={(e) => {
+                        e.preventDefault();
+                        if (e.target instanceof HTMLElement) {
+                            e.target.style.backgroundColor = "";
+                        }
                     }}
                 />
             {/each}
