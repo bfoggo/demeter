@@ -177,6 +177,18 @@ export class PianoRollNote {
 
 }
 
+export class PianoRollChord {
+    keys: number[];
+    startPosX: number;
+    duration: number;
+    
+    constructor(keys: number[], startTime: number, duration: number) {
+        this.keys = keys;
+        this.startPosX = startTime;
+        this.duration = duration;
+    }
+}
+
 export class PianoRollGrid {
     musicContext: MusicContext;
     keyHeight: number;
