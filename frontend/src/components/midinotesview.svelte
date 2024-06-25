@@ -76,7 +76,6 @@
                 }
             }}
             on:dragstart={(e) => {
-                console.log(midiNote);
                 startX = e.clientX;
                 startY = e.clientY;
                 if (e.target instanceof HTMLElement) {
