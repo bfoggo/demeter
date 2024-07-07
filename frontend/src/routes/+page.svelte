@@ -10,6 +10,8 @@
     import { PlaybackTimer } from "../types/playback";
     import { kickSound, snareSound, noteBlipSound } from "../types/sounds";
     import type { Stoppable } from "../types/sounds";
+    import RaidalMenu from "../components/radialMenu.svelte";
+    import RadialMenu from "../components/radialMenu.svelte";
 
     var audioContext: AudioContext;
     onMount(() => {
@@ -25,7 +27,6 @@
     $: reverseKeys = $musicContext.keys().slice().reverse();
 
     var midiNotes: Writable<Set<PianoRollNote>> = writable(new Set());
-
 
     function playNote(note: Note) {
         noteBlipSound(0.0, note.frequency(), audioContext);
@@ -133,6 +134,7 @@
             playNote={playNoteThrottled}
             {reverseKeys}
         />
+        <RadialMenu />
     </div>
 </div>
 <button

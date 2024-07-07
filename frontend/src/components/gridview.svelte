@@ -49,7 +49,7 @@
     });
 </script>
 
-<div class="w-full overflow-auto scroll-smooth pb-4 z-0" bind:this={gridEle}>
+<div class="overflow-auto scroll-smooth pb-4 z-0" bind:this={gridEle}>
     <div
         class="z-1"
         style="position: relative; height: {grid.totalHeight()}px; width: {grid.totalWidth()}px;"
