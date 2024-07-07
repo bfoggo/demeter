@@ -52,6 +52,35 @@ export class Note {
     }
 }
 
+export type Chord = Note[];
+
+type ThirdQuality = "major" | "minor" | "sus2" | "sus4";
+type FifthQuality = "perfect" | "diminished" | "augmented";
+type SeventhQuality = null | "major" | "minor" | "diminished" | "augmented";
+type NinthQuality = null | "major" | "minor" | "diminished" | "augmented";
+type EleventhQuality = null | "perfect" | "augmented";
+type ThirteenthQuality = null | "major" | "minor" | "diminished" | "augmented";
+
+class ChordGrammar {
+    root: NoteName;
+    third: ThirdQuality;
+    fifth: FifthQuality;
+    seventh: SeventhQuality;
+    ninth: NinthQuality;
+    eleventh: EleventhQuality;
+    thirteenth: ThirteenthQuality;
+
+    constructor(root: NoteName, third: ThirdQuality, fifth: FifthQuality, seventh: SeventhQuality, ninth: NinthQuality, eleventh: EleventhQuality, thirteenth: ThirteenthQuality) {
+        this.root = root;
+        this.third = third;
+        this.fifth = fifth;
+        this.seventh = seventh;
+        this.ninth = ninth;
+        this.eleventh = eleventh;
+        this.thirteenth = thirteenth;
+    }
+}
+
 export function pianoColor(note: Note) {
     if (note.name === NoteName.C){
         return "yellow";
