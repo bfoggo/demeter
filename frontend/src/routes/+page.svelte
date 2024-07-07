@@ -8,7 +8,7 @@
     import GridVeiw from "../components/gridview.svelte";
     import { PianoRollNote, PianoRollGrid } from "../types/pianoRoll";
     import { PlaybackTimer } from "../types/playback";
-    import { kickSound, highHatSound, noteSound } from "../types/sounds";
+    import { kickSound, snareSound, noteBlipSound } from "../types/sounds";
     import type { Stoppable } from "../types/sounds";
 
     var audioContext: AudioContext;
@@ -28,7 +28,7 @@
 
 
     function playNote(note: Note) {
-        noteSound(0.0, note.frequency(), audioContext);
+        noteBlipSound(0.0, note.frequency(), audioContext);
     }
     var playbackTimeouts: Set<Note> = new Set();
     function playNoteThrottled(note: Note) {
@@ -72,12 +72,12 @@
             }
             for (var minorLine of grid.minorLinesPosX()) {
                 let time_at_minor_line = grid.posXToTime(minorLine);
-                stoppables.push(highHatSound(time_at_minor_line, audioContext));
+                stoppables.push(snareSound(time_at_minor_line, audioContext));
             }
             for (var midiNote of $midiNotes) {
                 let time_at_midi_note = grid.posXToTime(midiNote.startPosX);
                 stoppables.push(
-                    noteSound(
+                    noteBlipSound(
                         time_at_midi_note,
                         $musicContext
                             .keys()
