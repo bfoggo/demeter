@@ -4,9 +4,10 @@ export interface Stoppable {
     stop: () => void;
 }
 
-export const noteBlipSound = (start: number, frequency: number, ctx: AudioContext) => singleOscSound(start, frequency, ctx, blipADSR(0.2), 'triangle');
+export const noteBlipSound = (start: number, frequency: number, ctx: AudioContext) => singleOscSound(start, frequency, ctx, blipADSR(0.1), 'triangle');
 export const kickSound = (start: number, ctx: AudioContext) => singleOscSound(start, 50, ctx, thumpADSR(1.0), 'triangle');
 export const snareSound = (start: number, ctx: AudioContext) => singleBufferSound(start, whiteNoiseBuffer(ctx), ctx, rattleADSR(0.05));
+export const noteLushSound = (start: number, frequency: number, ctx: AudioContext) => singleOscSound(start, frequency, ctx, lushADSR(0.2), 'sine');
 export function emptySound(start: number, ctx: AudioContext) {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -35,11 +36,16 @@ export class ADSR {
         this.release = release;
         this.volume = volume;
     }
+
+    totalTime() {
+        return this.attack + this.decay + this.release;
+    }
 }
 
 const blipADSR = (volume: number) => new ADSR(0.01, 0.2, 0.01, 0.05, volume);
-const thumpADSR = (volume: number) => new ADSR(0.01, 0.3, 0.01, 0.05, volume);
-const rattleADSR = (volume: number) => new ADSR(0.02, 0.2, 0.05, 0.01, volume);
+const thumpADSR = (volume: number) => new ADSR(0.01, 0.2, 0.01, 0.05, volume);
+const rattleADSR = (volume: number) => new ADSR(0.01, 0.2, 0.05, 0.01, volume);
+const lushADSR = (volume: number) => new ADSR(0.05, 0.2, .2, 0.4, volume);
 
 function singleOscSound(start: number, frequency: number, ctx: AudioContext, adsr: ADSR, osc_type: OscillatorType): Stoppable {
     const osc = ctx.createOscillator();
@@ -53,8 +59,9 @@ function singleOscSound(start: number, frequency: number, ctx: AudioContext, ads
     let realStart = start + current_time;
 
     gain.gain.value = 0;
+    gain.gain.linearRampToValueAtTime(0, realStart);
     gain.gain.linearRampToValueAtTime(adsr.volume, realStart + adsr.attack);
-    gain.gain.exponentialRampToValueAtTime(adsr.sustain * adsr.volume, realStart + adsr.attack + adsr.decay);
+    gain.gain.linearRampToValueAtTime(adsr.sustain * adsr.volume, realStart + adsr.attack + adsr.decay);
     gain.gain.linearRampToValueAtTime(0, realStart + adsr.attack + adsr.decay + adsr.release);
     osc.start(realStart);
     osc.stop(realStart + adsr.attack + adsr.decay + adsr.release);
@@ -73,8 +80,9 @@ function singleBufferSound(start: number, buffer: AudioBuffer, ctx: AudioContext
     let realStart = start + current_time;
 
     gain.gain.value = 0
+    gain.gain.linearRampToValueAtTime(0, realStart);
     gain.gain.linearRampToValueAtTime(adsr.volume, realStart + adsr.attack);
-    gain.gain.exponentialRampToValueAtTime(adsr.sustain * adsr.volume, realStart + adsr.attack + adsr.decay);
+    gain.gain.linearRampToValueAtTime(adsr.sustain * adsr.volume, realStart + adsr.attack + adsr.decay);
     gain.gain.linearRampToValueAtTime(0, realStart + adsr.attack + adsr.decay + adsr.release);
     source.start(realStart);
     source.stop(realStart + adsr.decay + adsr.attack + adsr.release);
