@@ -16,7 +16,7 @@
     }
 
     let outerRadius = 192;
-    let innerRadius = 70;
+    let innerRadius = 100;
     let outerWedgePoints = newPointSet(outerRadius);
     let innerWedgePoints = newPointSet(innerRadius);
 
@@ -68,6 +68,7 @@
     }
     path:hover {
         cursor: pointer;
-        opacity: 0.5;
+        opacity: 0.2;
+        transition: opacity 0.2s;
     }
 </style>
