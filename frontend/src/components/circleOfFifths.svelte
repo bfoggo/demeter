@@ -37,24 +37,35 @@
 </script>
 
 <div class="border-2 rounded-full w-96 h-96 m-auto overflow-hidden">
-    <svg width="384" height="384" xmlns="http://www.w3.org/2000/svg">
-        {#each Array.from({ length: numWedges }, (_, i) => i) as i}
-            <path
-                d={` 
+    <div class="relative w-full h-full">
+        <svg width="384" height="384" xmlns="http://www.w3.org/2000/svg">
+            {#each Array.from({ length: numWedges }, (_, i) => i) as i}
+                <path
+                    d={` 
                     M ${innerWedgePoints[i][0]} ${innerWedgePoints[i][1]}
                     L ${outerWedgePoints[i][0]} ${outerWedgePoints[i][1]}
                     A ${outerRadius} ${outerRadius} 0 0 0 ${outerWedgePoints[(i + 1) % numWedges][0]} ${outerWedgePoints[(i + 1) % numWedges][1]}
                     L ${innerWedgePoints[(i + 1) % numWedges][0]} ${innerWedgePoints[(i + 1) % numWedges][1]}
                     A ${innerRadius} ${innerRadius} 0 0 1 ${innerWedgePoints[i][0]} ${innerWedgePoints[i][1]}
                     `}
-                fill={pianoRollColor(noteNames[i])}
-            />
-        {/each}
-    </svg>
-    <p class="aboslute left-50% top-50%">Placeholder</p>
+                    fill={pianoRollColor(noteNames[i])}
+                />
+            {/each}
+        </svg>
+        <div
+            class="absolute left-1/2 top-1/2 text-2xl transform -translate-x-1/2 -translate-y-1/2 font-serif font-extrabold"
+        >
+            C
+        </div>
+    </div>
 </div>
 
 <style>
+    svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
     path:hover {
         cursor: pointer;
         opacity: 0.5;
