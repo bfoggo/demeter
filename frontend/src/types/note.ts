@@ -129,6 +129,6 @@ export function pianoRollColor(notename: NoteName): HexString {
     if (notename === NoteName.ASharp){
         return "#FF5500";
     }
-    throw new Error("Invalid note");
+    throw new Error("Invalid note" + notename);
 }
 export type HexString = String;

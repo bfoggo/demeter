@@ -1,9 +1,9 @@
 <script lang="ts">
     import type { Writable, get } from "svelte/store";
-    import type { HexString, Note } from "../types/note";
+    import type { HexString, Note, NoteName } from "../types/note";
     import type { PianoRollGrid, PianoRollNote } from "../types/pianoRoll";
 
-    export let pianoRollColor: (note: Note) => HexString;
+    export let pianoRollColor: (note: NoteName) => HexString;
     export let midiNotes: Writable<Set<PianoRollNote>>;
     export let grid: PianoRollGrid;
     export let reverseKeys: Note[];
@@ -59,7 +59,7 @@
             role="button"
             tabindex="-1"
             class="opacity-50 hover:bg-gray-400 border-2 border-black z-2"
-            style="background: {pianoRollColor(reverseKeys[midiNote.key])};
+            style="background: {pianoRollColor(reverseKeys[midiNote.key].name)};
                         position: absolute; left: {midiNote.startPosX}px; top: {midiNote.key *
                 grid.keyHeight}px; height: {grid.keyHeight}px; width: {midiNote.duration}px;"
             on:dblclick={() => {
