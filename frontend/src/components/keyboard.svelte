@@ -1,11 +1,11 @@
 <script lang="ts">
-    import type { Note } from "../types/note";
+    import type { Note, NoteName } from "../types/note";
     import type { HexString } from "../types/note";
     export let keys: Note[];
     export let keyHeight: number;
     export let width: number;
     export let playNote: (note: Note) => void;
-    export let noteColors: (note: Note) => HexString;
+    export let noteColors: (note: NoteName) => HexString;
 
     $: reverseKeys = keys.slice().reverse();
 </script>
@@ -17,7 +17,7 @@
     {#each reverseKeys as key, keyIndex}
         <button
             style="height: {keyHeight}px; width: {width}px; background-color: {noteColors(
-                key,
+                key.name,
             )}"
             class="border-2 border-black border-r-0 cursor-pointer margin-0"
             type="button"

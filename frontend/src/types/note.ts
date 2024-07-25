@@ -92,41 +92,41 @@ export function pianoColor(note: Note) {
     }
 }
 
-export function pianoRollColor(note: Note): HexString {
-    if (note.name === NoteName.B){
+export function pianoRollColor(notename: NoteName): HexString {
+    if (notename === NoteName.B){
         return "#FF0055";
     }
-    if (note.name === NoteName.C){
+    if (notename === NoteName.C){
         return "#AA00FF";
     }
-    if (note.name === NoteName.CSharp){
+    if (notename === NoteName.CSharp){
         return "#0000FF";
     }
-    if (note.name === NoteName.D){
+    if (notename === NoteName.D){
         return "#0055FF";
     }
-    if (note.name === NoteName.DSharp){
+    if (notename === NoteName.DSharp){
         return "#00AAFF";
     }
-    if (note.name === NoteName.E){
+    if (notename === NoteName.E){
         return "#00FFD4";
     }
-    if (note.name === NoteName.F){
+    if (notename === NoteName.F){
         return "#00FF55";
     }
-    if (note.name === NoteName.FSharp){
+    if (notename === NoteName.FSharp){
         return "#55FF00";
     }
-    if (note.name === NoteName.G){
+    if (notename === NoteName.G){
         return "#AAFF00";
     }
-    if (note.name === NoteName.GSharp){
+    if (notename === NoteName.GSharp){
         return "#FFD400";
     }
-    if (note.name === NoteName.A){
+    if (notename === NoteName.A){
         return "#FFAA00";
     }
-    if (note.name === NoteName.ASharp){
+    if (notename === NoteName.ASharp){
         return "#FF5500";
     }
     throw new Error("Invalid note");

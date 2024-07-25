@@ -10,8 +10,7 @@
     import { PlaybackTimer } from "../types/playback";
     import { kickSound, snareSound, noteBlipSound } from "../types/sounds";
     import type { Stoppable } from "../types/sounds";
-    import RaidalMenu from "../components/radialMenu.svelte";
-    import RadialMenu from "../components/radialMenu.svelte";
+    import CircleOfFifths from "../components/circleOfFifths.svelte";
 
     var audioContext: AudioContext;
     onMount(() => {
@@ -134,7 +133,7 @@
             playNote={playNoteThrottled}
             {reverseKeys}
         />
-        <RadialMenu />
+        <CircleOfFifths />
     </div>
 </div>
 <button
