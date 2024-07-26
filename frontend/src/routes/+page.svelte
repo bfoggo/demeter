@@ -1,6 +1,7 @@
 <script lang="ts">
     import { afterUpdate, onMount } from "svelte";
-    import { Note, pianoRollColor } from "../types/note";
+    import type { Note } from "../types/note";
+    import { pianoRollColor, frequency } from "../types/note";
     import { MusicContext } from "../types/context";
     import Keyboard from "../components/keyboard.svelte";
     import { writable, type Writable } from "svelte/store";
@@ -28,7 +29,7 @@
     var midiNotes: Writable<Set<PianoRollNote>> = writable(new Set());
 
     function playNote(note: Note) {
-        noteBlipSound(0.0, note.frequency(), audioContext);
+        noteBlipSound(0.0, frequency(note), audioContext);
     }
     var playbackTimeouts: Set<Note> = new Set();
     function playNoteThrottled(note: Note) {
@@ -79,11 +80,11 @@
                 stoppables.push(
                     noteBlipSound(
                         time_at_midi_note,
-                        $musicContext
-                            .keys()
-                            [
+                        frequency(
+                            $musicContext.keys()[
                                 $musicContext.keys().length - midiNote.key - 1
-                            ].frequency(),
+                            ],
+                        ),
                         audioContext,
                     ),
                 );

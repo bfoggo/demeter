@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Writable, get } from "svelte/store";
-    import type { HexString, Note, NoteName } from "../types/note";
+    import type { HexString, Note, NoteName} from "../types/note";
     import type { PianoRollGrid, PianoRollNote } from "../types/pianoRoll";
 
     export let pianoRollColor: (note: NoteName) => HexString;

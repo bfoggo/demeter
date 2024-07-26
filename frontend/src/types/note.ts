@@ -1,86 +1,141 @@
-
-export enum NoteName {
-    C = 0,
-    CSharp = 1,
-    D = 2,
-    DSharp = 3,
-    E = 4,
-    F = 5,
-    FSharp = 6,
-    G = 7,
-    GSharp = 8,
-    A = 9,
-    ASharp = 10,
-    B = 11
-}
-
-export function flatstr(noteName: NoteName): string {
-    switch (noteName) {
-        case NoteName.C:
-            return "C";
-        case NoteName.CSharp:
-            return "Db";
-        case NoteName.D:
-            return "D";
-        case NoteName.DSharp:
-            return "Eb";
-        case NoteName.E:
-            return "E";
-        case NoteName.F:
-            return "F";
-        case NoteName.FSharp:
-            return "Gb";
-        case NoteName.G:
-            return "G";
-        case NoteName.GSharp:
-            return "Ab";
-        case NoteName.A:
-            return "A";
-        case NoteName.ASharp:
-            return "Bb";
-        case NoteName.B:
-            return "B";
-    }
-}
-
-export class Note {
+export type NoteName = { noteSet: "sharps", name: NoteNameSharp } | { noteSet: "flats", name: NoteNameFlat };
+export type Octave = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+export type Note = {
     name: NoteName;
-    octave: number;
-
-    constructor(name: NoteName, octave: number) {
-        this.name = name;
-        this.octave = octave;
+    octave: Octave;
+};
+export function allNoteNamesFromOctave(octave: Octave, noteSet: "sharps" | "flats" = "sharps"): Note[] {
+    if (noteSet === "flats") {
+        const strNames = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"] as NoteNameFlat[];
+        return strNames.map((strName) => ({ name: { noteSet, name: strName }, octave }));
     }
-
-    fullName() {
-        return this.name + this.octave;
+    if (noteSet === "sharps") {
+        const strNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] as NoteNameSharp[];
+        return strNames.map((strName) => ({ name: { noteSet, name: strName }, octave }));
     }
-
-    frequency() {
-        const a = 440;
-        const n = this.name.valueOf() + (this.octave) * 12;
-        return Math.pow(2, (n - 57) / 12) * a;
+    throw new Error("Invalid note set " + noteSet);
+}
+export function frequency(note: Note): number {
+    const a = 440;
+    const n = noteNameIndex(note.name) + (note.octave) * 12;
+    return Math.pow(2, (n - 57) / 12) * a;
+}
+export function pianoColor(note: Note) {
+    if (note.name.name === "C") {
+        return "yellow";
     }
-
-    static allFromOctave(octave: number) {
-        const orderedNotes = [
-            NoteName.C,
-            NoteName.CSharp,
-            NoteName.D,
-            NoteName.DSharp,
-            NoteName.E,
-            NoteName.F,
-            NoteName.FSharp,
-            NoteName.G,
-            NoteName.GSharp,
-            NoteName.A,
-            NoteName.ASharp,
-            NoteName.B
-        ];
-        return orderedNotes.map(name => new Note(name, octave));
+    if (note.name.name === "D" || note.name.name === "E" || note.name.name === "F" || note.name.name === "G" || note.name.name === "A" || note.name.name === "B") {
+        return "white";
+    } else {
+        return "black";
     }
 }
+export function pianoRollColor(notename: NoteName): HexString {
+    if (asSharp.get(notename.name) === "B") {
+        return "#FF0055";
+    }
+    if (asSharp.get(notename.name) === "C") {
+        return "#AA00FF";
+    }
+    if (asSharp.get(notename.name) === "C#") {
+        return "#0000FF";
+    }
+    if (asSharp.get(notename.name) === "D") {
+        return "#0055FF";
+    }
+    if (asSharp.get(notename.name) === "D#") {
+        return "#00AAFF";
+    }
+    if (asSharp.get(notename.name) === "E") {
+        return "#00FFD4";
+    }
+    if (asSharp.get(notename.name) === "F") {
+        return "#00FF55";
+    }
+    if (asSharp.get(notename.name) === "F#") {
+        return "#55FF00";
+    }
+    if (asSharp.get(notename.name) === "G") {
+        return "#AAFF00";
+    }
+    if (asSharp.get(notename.name) === "G#") {
+        return "#FFD400";
+    }
+    if (asSharp.get(notename.name) === "A") {
+        return "#FFAA00";
+    }
+    if (asSharp.get(notename.name) === "A#") {
+        return "#FF5500";
+    }
+    throw new Error("Invalid note" + notename);
 
+}
+export type HexString = String;
+
+type NoteNameSharp = "C" | "C#" | "D" | "D#" | "E" | "F" | "F#" | "G" | "G#" | "A" | "A#" | "B";
+type NoteNameFlat = "C" | "Db" | "D" | "Eb" | "E" | "F" | "Gb" | "G" | "Ab" | "A" | "Bb" | "B";
+
+const asSharp: Map<string, string> = new Map([
+    ["C", "C"],
+    ["Db", "C#"],
+    ["D", "D"],
+    ["Eb", "D#"],
+    ["E", "E"],
+    ["F", "F"],
+    ["Gb", "F#"],
+    ["G", "G"],
+    ["Ab", "G#"],
+    ["A", "A"],
+    ["Bb", "A#"],
+    ["B", "B"],
+    ["C#", "C#"],
+    ["D#", "D#"],
+    ["F#", "F#"],
+    ["G#", "G#"],
+    ["A#", "A#"]
+
+]);
+
+const sharpToIndex: Map<NoteNameSharp, number> = new Map([
+    ["C" as NoteNameSharp, 0],
+    ["C#" as NoteNameSharp, 1],
+    ["D" as NoteNameSharp, 2],
+    ["D#" as NoteNameSharp, 3],
+    ["E" as NoteNameSharp, 4],
+    ["F" as NoteNameSharp, 5],
+    ["F#" as NoteNameSharp, 6],
+    ["G" as NoteNameSharp, 7],
+    ["G#" as NoteNameSharp, 8],
+    ["A" as NoteNameSharp, 9],
+    ["A#" as NoteNameSharp, 10],
+    ["B" as NoteNameSharp, 11]
+]);
+const flatToIndex: Map<NoteNameFlat, number> = new Map([
+    ["C" as NoteNameFlat, 0],
+    ["Db" as NoteNameFlat, 1],
+    ["D" as NoteNameFlat, 2],
+    ["Eb" as NoteNameFlat, 3],
+    ["E" as NoteNameFlat, 4],
+    ["F" as NoteNameFlat, 5],
+    ["Gb" as NoteNameFlat, 6],
+    ["G" as NoteNameFlat, 7],
+    ["Ab" as NoteNameFlat, 8],
+    ["A" as NoteNameFlat, 9],
+    ["Bb" as NoteNameFlat, 10],
+    ["B" as NoteNameFlat, 11]
+]);
+
+function noteNameIndex(note: NoteName): number {
+    if (note.noteSet === "sharps") {
+        return sharpToIndex.get(note.name) as number;
+    }
+    if (note.noteSet === "flats") {
+        return flatToIndex.get(note.name) as number;
+    }
+    throw new Error("Invalid note " + note);
+}
+
+// TODO
 export type Chord = Note[];
 
 type ThirdQuality = "major" | "minor" | "sus2" | "sus4";
@@ -91,7 +146,7 @@ type EleventhQuality = null | "perfect" | "augmented";
 type ThirteenthQuality = null | "major" | "minor" | "diminished" | "augmented";
 
 class ChordGrammar {
-    root: NoteName;
+    root: NoteNameSharp;
     third: ThirdQuality;
     fifth: FifthQuality;
     seventh: SeventhQuality;
@@ -99,7 +154,7 @@ class ChordGrammar {
     eleventh: EleventhQuality;
     thirteenth: ThirteenthQuality;
 
-    constructor(root: NoteName, third: ThirdQuality, fifth: FifthQuality, seventh: SeventhQuality, ninth: NinthQuality, eleventh: EleventhQuality, thirteenth: ThirteenthQuality) {
+    constructor(root: NoteNameSharp, third: ThirdQuality, fifth: FifthQuality, seventh: SeventhQuality, ninth: NinthQuality, eleventh: EleventhQuality, thirteenth: ThirteenthQuality) {
         this.root = root;
         this.third = third;
         this.fifth = fifth;
@@ -109,55 +164,3 @@ class ChordGrammar {
         this.thirteenth = thirteenth;
     }
 }
-
-export function pianoColor(note: Note) {
-    if (note.name === NoteName.C) {
-        return "yellow";
-    }
-    if (note.name === NoteName.D || note.name === NoteName.E || note.name === NoteName.F || note.name === NoteName.G || note.name === NoteName.A || note.name === NoteName.B) {
-        return "white";
-    } else {
-        return "black";
-    }
-}
-
-export function pianoRollColor(notename: NoteName): HexString {
-    if (notename === NoteName.B) {
-        return "#FF0055";
-    }
-    if (notename === NoteName.C) {
-        return "#AA00FF";
-    }
-    if (notename === NoteName.CSharp) {
-        return "#0000FF";
-    }
-    if (notename === NoteName.D) {
-        return "#0055FF";
-    }
-    if (notename === NoteName.DSharp) {
-        return "#00AAFF";
-    }
-    if (notename === NoteName.E) {
-        return "#00FFD4";
-    }
-    if (notename === NoteName.F) {
-        return "#00FF55";
-    }
-    if (notename === NoteName.FSharp) {
-        return "#55FF00";
-    }
-    if (notename === NoteName.G) {
-        return "#AAFF00";
-    }
-    if (notename === NoteName.GSharp) {
-        return "#FFD400";
-    }
-    if (notename === NoteName.A) {
-        return "#FFAA00";
-    }
-    if (notename === NoteName.ASharp) {
-        return "#FF5500";
-    }
-    throw new Error("Invalid note" + notename);
-}
-export type HexString = String;

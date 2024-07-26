@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { NoteName, pianoRollColor, flatstr } from "../types/note";
+    import type { NoteName } from "../types/note";
+    import { pianoRollColor } from "../types/note";
     let center = [192, 192];
     let numWedges = 12;
     let wedgeAngle = (2 * Math.PI) / numWedges;
@@ -22,29 +23,32 @@
     let innerWedgePoints = newPointSet(innerRadius);
     let halfWedgePoints = newPointSet(halfRadius, 15);
 
-    let noteNames = [
-        NoteName.A,
-        NoteName.D,
-        NoteName.G,
-        NoteName.C,
-        NoteName.F,
-        NoteName.ASharp,
-        NoteName.DSharp,
-        NoteName.GSharp,
-        NoteName.CSharp,
-        NoteName.FSharp,
-        NoteName.B,
-        NoteName.E,
+    const CoFCounterClockwiseAStart = [
+        "A",
+        "D",
+        "G",
+        "C",
+        "F",
+        "Bb",
+        "Eb",
+        "Ab",
+        "Db",
+        "Gb",
+        "B",
+        "E",
     ];
+    let noteNames = CoFCounterClockwiseAStart.map(
+        (name) => ({ noteSet: "flats", name }) as NoteName,
+    );
 
     let currentHoveredNote: string | null = null;
-    let currentSelectedNote: NoteName = NoteName.C;
+    let currentSelectedNote: NoteName = { noteSet: "flats", name: "C" };
     function setHoveredNoteName(noteName: NoteName | null) {
         if (noteName === null) {
             currentHoveredNote = null;
             return;
         }
-        currentHoveredNote = flatstr(noteName);
+        currentHoveredNote = noteName.name;
     }
     function setSelectedNoteName(noteName: NoteName) {
         currentSelectedNote = noteName;
@@ -84,7 +88,7 @@
                     font-size="12"
                     text-anchor="middle"
                 >
-                    {flatstr(noteNames[i])}
+                    {noteNames[i].name}
                 </text>
             {/each}
         </svg>
@@ -98,7 +102,7 @@
             <div
                 class="absolute left-1/2 top-1/2 text-5xl transform -translate-x-1/2 -translate-y-1/2 font-serif font-extrabold"
             >
-                {flatstr(currentSelectedNote)}
+                {currentSelectedNote.name}
             </div>
         {/if}
     </div>
