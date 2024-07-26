@@ -14,6 +14,35 @@ export enum NoteName {
     B = 11
 }
 
+export function flatstr(noteName: NoteName): string {
+    switch (noteName) {
+        case NoteName.C:
+            return "C";
+        case NoteName.CSharp:
+            return "Db";
+        case NoteName.D:
+            return "D";
+        case NoteName.DSharp:
+            return "Eb";
+        case NoteName.E:
+            return "E";
+        case NoteName.F:
+            return "F";
+        case NoteName.FSharp:
+            return "Gb";
+        case NoteName.G:
+            return "G";
+        case NoteName.GSharp:
+            return "Ab";
+        case NoteName.A:
+            return "A";
+        case NoteName.ASharp:
+            return "Bb";
+        case NoteName.B:
+            return "B";
+    }
+}
+
 export class Note {
     name: NoteName;
     octave: number;
@@ -82,7 +111,7 @@ class ChordGrammar {
 }
 
 export function pianoColor(note: Note) {
-    if (note.name === NoteName.C){
+    if (note.name === NoteName.C) {
         return "yellow";
     }
     if (note.name === NoteName.D || note.name === NoteName.E || note.name === NoteName.F || note.name === NoteName.G || note.name === NoteName.A || note.name === NoteName.B) {
@@ -93,40 +122,40 @@ export function pianoColor(note: Note) {
 }
 
 export function pianoRollColor(notename: NoteName): HexString {
-    if (notename === NoteName.B){
+    if (notename === NoteName.B) {
         return "#FF0055";
     }
-    if (notename === NoteName.C){
+    if (notename === NoteName.C) {
         return "#AA00FF";
     }
-    if (notename === NoteName.CSharp){
+    if (notename === NoteName.CSharp) {
         return "#0000FF";
     }
-    if (notename === NoteName.D){
+    if (notename === NoteName.D) {
         return "#0055FF";
     }
-    if (notename === NoteName.DSharp){
+    if (notename === NoteName.DSharp) {
         return "#00AAFF";
     }
-    if (notename === NoteName.E){
+    if (notename === NoteName.E) {
         return "#00FFD4";
     }
-    if (notename === NoteName.F){
+    if (notename === NoteName.F) {
         return "#00FF55";
     }
-    if (notename === NoteName.FSharp){
+    if (notename === NoteName.FSharp) {
         return "#55FF00";
     }
-    if (notename === NoteName.G){
+    if (notename === NoteName.G) {
         return "#AAFF00";
     }
-    if (notename === NoteName.GSharp){
+    if (notename === NoteName.GSharp) {
         return "#FFD400";
     }
-    if (notename === NoteName.A){
+    if (notename === NoteName.A) {
         return "#FFAA00";
     }
-    if (notename === NoteName.ASharp){
+    if (notename === NoteName.ASharp) {
         return "#FF5500";
     }
     throw new Error("Invalid note" + notename);
