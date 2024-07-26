@@ -96,7 +96,7 @@
             <div
                 class="absolute left-1/2 top-1/2 text-3xl transform -translate-x-1/2 -translate-y-1/2 font-serif"
             >
-                {currentHoveredNote}
+            {currentSelectedNote.name} > {currentHoveredNote}
             </div>
         {:else}
             <div
