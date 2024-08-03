@@ -22,74 +22,66 @@ export function allTuplets(): Tuplet[] {
     return ["None", "Triplet", "Quintuplet", "Septuplet", "Nonuplet"];
 }
 
-export class TimeSignature {
-    numerator: number;
+export type TimeSignatureNumerator = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16;
+export function allTimeSignatureNumerators(): TimeSignatureNumerator[] {
+    return [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+}
+
+export type TimeSignature = {
+    numerator: TimeSignatureNumerator;
     denominator: TimeSignatureDenominator;
+};
 
-    constructor(numerator: number, denominator: TimeSignatureDenominator) {
-        if (Math.round(numerator) !== numerator) {
-            throw new Error("Numerator must be an integer");
-        }
-
-        this.numerator = numerator;
-        this.denominator = denominator;
+export function complexityPatterns(timesig: TimeSignature): ComplexityPattern[] {
+    switch (timesig.denominator) {
+        case 4:
+            return ["S".repeat(timesig.numerator)] as ComplexityPattern[];
+        case 8:
+            var results: ComplexityPattern[] = []
+            for (const twoThree of twosAndThreesSummingToN(timesig.numerator)) {
+                const pattern = Array.from({ length: twoThree.twos }, () => "S").concat(Array.from({ length: twoThree.threes }, () => "C"));
+                let permutations = distinguishablePermutations(pattern);
+                results.push(...permutations.map(pattern => pattern.join("") as ComplexityPattern));
+            }
+            return results;
     }
+}
 
-    complexityPatterns(): ComplexityPattern[] {
-        switch (this.denominator) {
-            case 4:
-                return ["S".repeat(this.numerator)] as ComplexityPattern[];
-            case 8:
-                var results: ComplexityPattern[] = []
-                for (const twoThree of twosAndThreesSummingToN(this.numerator)) {
-                    const pattern = Array.from({ length: twoThree.twos }, () => "S").concat(Array.from({ length: twoThree.threes }, () => "C"));
-                    let permutations = distinguishablePermutations(pattern);
-                    results.push(...permutations.map(pattern => pattern.join("") as ComplexityPattern));
-                }
-                return results;
-        }
+export function numDivisionsPerMeasure(timesig: TimeSignature, division: Division, tuplet: Tuplet): number {
+    var numDivisions;
+    switch (division) {
+        case "Whole":
+            numDivisions = timesig.numerator / timesig.denominator;
+            break;
+        case "Half":
+            numDivisions = 2 * timesig.numerator / timesig.denominator;
+            break
+        case "Quarter":
+            numDivisions = 4 * timesig.numerator / timesig.denominator;
+            break;
+        case "Eighth":
+            numDivisions = 8 * timesig.numerator / timesig.denominator;
+            break;
+        case "Sixteenth":
+            numDivisions = 16 * timesig.numerator / timesig.denominator;
+            break;
+        case "ThirtySecond":
+            numDivisions = 32 * timesig.numerator / timesig.denominator;
+            break;
     }
-
-    numDivisionsPerMeasure(division: Division, tuplet: Tuplet): number {
-        var numDivisions;
-        switch (division) {
-            case "Whole":
-                numDivisions = this.numerator / this.denominator;
-                break;
-            case "Half":
-                numDivisions = 2 * this.numerator / this.denominator;
-                break
-            case "Quarter":
-                numDivisions = 4 * this.numerator / this.denominator;
-                break;
-            case "Eighth":
-                numDivisions = 8 * this.numerator / this.denominator;
-                break;
-            case "Sixteenth":
-                numDivisions = 16 * this.numerator / this.denominator;
-                break;
-            case "ThirtySecond":
-                numDivisions = 32 * this.numerator / this.denominator;
-                break;
-        }
-        switch (tuplet) {
-            case "None":
-                return numDivisions;
-            case "Triplet":
-                return numDivisions * 3 / 2;
-            case "Quintuplet":
-                return numDivisions * 5 / 2;
-            case "Septuplet": 
-                return numDivisions * 7 / 2;
-            case "Nonuplet": 
-                return numDivisions * 9 / 2;
-        }
-        return numDivisions;
+    switch (tuplet) {
+        case "None":
+            return numDivisions;
+        case "Triplet":
+            return numDivisions * 3 / 2;
+        case "Quintuplet":
+            return numDivisions * 5 / 2;
+        case "Septuplet":
+            return numDivisions * 7 / 2;
+        case "Nonuplet":
+            return numDivisions * 9 / 2;
     }
-
-    static allNumerators(): number[] {
-        return [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
-    }
+    return numDivisions;
 }
 
 export type PianoRollNote = {
@@ -198,7 +190,7 @@ export class PianoRollGrid {
     minorLinesPosX(): number[] {
         const gridLines = [];
         let current = 0;
-        for (let i = 0; i < this.musicContext.measures * this.musicContext.timeSignature.numDivisionsPerMeasure(this.musicContext.division, this.musicContext.tuplet); i++) {
+        for (let i = 0; i < this.musicContext.measures * numDivisionsPerMeasure(this.musicContext.timeSignature, this.musicContext.division, this.musicContext.tuplet); i++) {
             gridLines.push(current);
             current += this.divisionLength();
         }

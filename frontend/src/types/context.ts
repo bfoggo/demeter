@@ -1,7 +1,7 @@
 import type { Note, Octave } from "./note";
 import { allNotesInOctave } from "./note";
-import type { TimeSignatureDenominator , ComplexityPattern, Division, Tuplet} from "./pianoRoll";
-import { TimeSignature } from "./pianoRoll";
+import type { TimeSignatureDenominator, ComplexityPattern, Division, Tuplet } from "./pianoRoll";
+import { complexityPatterns, type TimeSignature } from "./pianoRoll";
 
 export class MusicContext {
     numOctaves: number;
@@ -17,8 +17,8 @@ export class MusicContext {
     constructor() {
         this.numOctaves = 2;
         this.startOctave = 4;
-        this.timeSignature = new TimeSignature(4, 4);
-        this.complexityPatternStr = this.timeSignature.complexityPatterns()[0];
+        this.timeSignature = { numerator: 4, denominator: 4 };
+        this.complexityPatternStr = complexityPatterns(this.timeSignature)[0];
         this.measures = 2;
         this.bpm = 120;
         this.division = "Quarter";
@@ -31,6 +31,6 @@ export class MusicContext {
     }
 
     reInitialiizePatternStr() {
-        this.complexityPatternStr = this.timeSignature.complexityPatterns()[0];
+        this.complexityPatternStr = complexityPatterns(this.timeSignature)[0];
     }
 }

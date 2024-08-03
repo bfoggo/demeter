@@ -1,9 +1,11 @@
 <script lang="ts">
     import {
-    AllTimeSignatureDenominators,
-        TimeSignature,
+        AllTimeSignatureDenominators,
+        type TimeSignature,
+        allTimeSignatureNumerators,
         allDivisions,
         allTuplets,
+        complexityPatterns,
     } from "../types/pianoRoll";
     import type { Writable } from "svelte/store";
     import Select from "flowbite-svelte/Select.svelte";
@@ -17,7 +19,7 @@
         <div class="pl-1 pr-4 flex items-center cursor-default">
             <span class="text-sm pr-1 text-nowrap">Time Signature</span>
             <Select
-                items={TimeSignature.allNumerators().map((n) => {
+                items={allTimeSignatureNumerators().map((n) => {
                     return { value: n, name: n };
                 })}
                 bind:value={$musicContext.timeSignature.numerator}
@@ -46,11 +48,11 @@
         >
             <span class="text-sm pr-1 text-nowrap">Pattern</span>
             <Select
-                items={$musicContext.timeSignature
-                    .complexityPatterns()
-                    .map((n) => {
+                items={complexityPatterns($musicContext.timeSignature).map(
+                    (n) => {
                         return { value: n, name: n };
-                    })}
+                    },
+                )}
                 bind:value={$musicContext.complexityPatternStr}
                 placeholder="complexity pattern"
                 size="sm"
@@ -71,7 +73,7 @@
             />
         </div>
         <div
-            class="flex items-center border-2 border-gray-100 border-r-0 border-t-0 border-b-0  cursor-default px-4"
+            class="flex items-center border-2 border-gray-100 border-r-0 border-t-0 border-b-0 cursor-default px-4"
         >
             <span class="text-sm text-nowrap pr-2">Division</span>
             <Select
