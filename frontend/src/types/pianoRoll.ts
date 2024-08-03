@@ -1,16 +1,16 @@
 import type { MusicContext } from "./context";
 import type { Note } from "./note";
+import { distinguishablePermutations, twosAndThreesSummingToN } from "./utils";
 
-export type TimeSignatureDenominator  = 4 | 8;
+export type TimeSignatureDenominator = 4 | 8;
 export function AllTimeSignatureDenominators(): TimeSignatureDenominator[] {
     return [4, 8];
 }
-
-
-export enum BeatComplexity {
-    Simple,
-    Compound,
+export type BeatComplexity = "S" | "C";
+export function allBeatComplexities(): BeatComplexity[] {
+    return ["S", "C"];
 }
+export type ComplexityPattern = string & { __complexityPattern: never };
 
 export enum Division {
     Whole = "Whole",
@@ -37,58 +37,6 @@ export function allTuplets(): Tuplet[] {
     return [Tuplet.None, Tuplet.Triplet, Tuplet.Quintuplet, Tuplet.Septuplet, Tuplet.Nonuplet];
 }
 
-export type ComplexityPattern = BeatComplexity[];
-
-
-export function beatPatternStr(pattern: ComplexityPattern): string {
-    return pattern.map(beat => beat === BeatComplexity.Simple ? "S" : "C").join("");
-}
-export function parseBeatPatternString(patternStr: string): ComplexityPattern {
-    if (patternStr === undefined || patternStr === null || patternStr === "") {
-        return [];
-    }
-    return patternStr.split("").map(char => char === "S" ? BeatComplexity.Simple : BeatComplexity.Compound);
-}
-
-function twosAndThreesSummingToN(n: number): { twos: number, threes: number }[] {
-    // All (x,y) such that 2x + 3y = n
-    if (n < 2) {
-        throw new Error("n must be at least 2");
-    }
-    const results = [];
-    for (let i = 0; i <= Math.floor(n / 2); i++) {
-        if ((n - 2 * i) % 3 === 0) {
-            results.push({ twos: i, threes: (n - 2 * i) / 3 });
-        }
-    }
-    return results;
-}
-
-function distinguishablePermutations(symbols: any[]): any[][] {
-    if (symbols.length === 0) {
-        return [[]]
-    }
-    if (symbols.length === 1) {
-        return [symbols];
-    }
-    const results: any[][] = [];
-    for (let i = 0; i < symbols.length; i++) {
-        const rest = [...symbols];
-        rest.splice(i, 1);
-        const restPermutations = distinguishablePermutations(rest);
-        for (const restPermutation of restPermutations) {
-            for (let j = 0; j <= restPermutation.length; j++) {
-                const permutation = [...restPermutation];
-                permutation.splice(j, 0, symbols[i]);
-                if (!results.find(result => result.join("") === permutation.join(""))) {
-                    results.push(permutation);
-                }
-            }
-        }
-    }
-    return results;
-}
-
 export class TimeSignature {
     numerator: number;
     denominator: TimeSignatureDenominator;
@@ -102,16 +50,16 @@ export class TimeSignature {
         this.denominator = denominator;
     }
 
-    complexityPatterns(): string[] {
+    complexityPatterns(): ComplexityPattern[] {
         switch (this.denominator) {
             case 4:
-                return [Array.from({ length: this.numerator }, () => BeatComplexity.Simple)].map(pattern=>beatPatternStr(pattern));
+                return ["S".repeat(this.numerator)] as ComplexityPattern[];
             case 8:
-                var results: string[] = []
+                var results: ComplexityPattern[] = []
                 for (const twoThree of twosAndThreesSummingToN(this.numerator)) {
-                    const pattern = Array.from({ length: twoThree.twos }, () => BeatComplexity.Simple).concat(Array.from({ length: twoThree.threes }, () => BeatComplexity.Compound));
-                    let permutations = distinguishablePermutations(pattern) as ComplexityPattern[];
-                    results.push(...permutations.map(pattern => beatPatternStr(pattern)));
+                    const pattern = Array.from({ length: twoThree.twos }, () => "S").concat(Array.from({ length: twoThree.threes }, () => "C"));
+                    let permutations = distinguishablePermutations(pattern);
+                    results.push(...permutations.map(pattern => pattern.join("") as ComplexityPattern));
                 }
                 return results;
         }
@@ -205,9 +153,9 @@ export class PianoRollGrid {
     majorLinesPosX(): number[] {
         var gridLines: number[] = [];
         let current = 0;
-        for (const complexity of parseBeatPatternString(this.musicContext.complexityPatternStr)) {
+        for (const complexity of this.musicContext.complexityPatternStr) {
             gridLines.push(current);
-            if (complexity === BeatComplexity.Simple) {
+            if (complexity === "S") {
                 current += 2 * this.eighthNoteWidth;
             } else {
                 current += 3 * this.eighthNoteWidth;

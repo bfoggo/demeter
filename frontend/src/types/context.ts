@@ -1,7 +1,7 @@
 import type { Note, Octave } from "./note";
 import { allNotesInOctave } from "./note";
-import type { TimeSignatureDenominator } from "./pianoRoll";
-import { TimeSignature, Division, Tuplet, type ComplexityPattern, beatPatternStr } from "./pianoRoll";
+import type { TimeSignatureDenominator , ComplexityPattern} from "./pianoRoll";
+import { TimeSignature, Division, Tuplet } from "./pianoRoll";
 
 export class MusicContext {
     numOctaves: number;
