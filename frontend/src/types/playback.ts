@@ -1,5 +1,5 @@
-import type { TimeSignatureDenominator } from "./pianoRoll";
-import { type TimeSignature } from "./pianoRoll";
+import type { TimeSignatureDenominator } from "./rhythm";
+import { type TimeSignature } from "./rhythm";
 
 
 export class PlaybackTimer {

@@ -1,12 +1,5 @@
 <script lang="ts">
-    import {
-        AllTimeSignatureDenominators,
-        type TimeSignature,
-        allTimeSignatureNumerators,
-        allDivisions,
-        allTuplets,
-        complexityPatterns,
-    } from "../types/pianoRoll";
+    import { allTimeSignatureNumerators, allTimeSignatureDenominators, allDivisions, allTuplets, complexityPatterns } from "../types/rhythm";
     import type { Writable } from "svelte/store";
     import Select from "flowbite-svelte/Select.svelte";
     import type { MusicContext } from "../types/context";
@@ -31,7 +24,7 @@
                 defaultClass="border-none hover:bg-gray-50 w-20  text-center focus:ring-0 cursor-pointer"
             />
             <Select
-                items={AllTimeSignatureDenominators().map((n) => {
+                items={allTimeSignatureDenominators().map((n) => {
                     return { value: n, name: n };
                 })}
                 bind:value={$musicContext.timeSignature.denominator}
