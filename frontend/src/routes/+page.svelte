@@ -1,13 +1,12 @@
 <script lang="ts">
-    import { afterUpdate, onMount } from "svelte";
+    import { onMount } from "svelte";
     import type { Note } from "../types/note";
     import { pianoRollColor, frequency } from "../types/note";
     import { MusicContext } from "../types/context";
     import Keyboard from "../components/keyboard.svelte";
-    import { writable, type Writable } from "svelte/store";
     import MusicSettings from "../components/musicsettings.svelte";
     import GridVeiw from "../components/gridview.svelte";
-    import type {PianoRollNote} from "../types/pianoRoll";
+    import type { PianoRollNote } from "../types/pianoRoll";
     import { PianoRollGrid } from "../types/pianoRoll";
     import { PlaybackTimer } from "../types/playback";
     import { kickSound, snareSound, noteBlipSound } from "../types/sounds";
@@ -18,16 +17,15 @@
     onMount(() => {
         audioContext = new AudioContext();
     });
-    let musicContext = writable(new MusicContext());
-    let timer = writable(new PlaybackTimer());
-
+    let musicContext = $state(new MusicContext());
+    let timer = $state(new PlaybackTimer());
     const keyHeight = 20;
     const eighthNoteWidth = 80;
-
-    $: grid = new PianoRollGrid($musicContext, keyHeight, eighthNoteWidth);
-    $: reverseKeys = $musicContext.keys.slice().reverse();
-
-    var midiNotes: Writable<Set<PianoRollNote>> = writable(new Set());
+    let grid = $derived(
+        new PianoRollGrid(musicContext, keyHeight, eighthNoteWidth),
+    );
+    let reverseKeys = $derived(musicContext.keys.slice().reverse());
+    var midiNotes: Set<PianoRollNote> = $state(new Set());
 
     function playNote(note: Note) {
         noteBlipSound(0.0, frequency(note), audioContext);
@@ -44,29 +42,12 @@
         }, 500);
     }
 
-    function startTimer() {
-        timer.update((t) => {
-            t.start();
-            return t;
-        });
-    }
-    function stopTimer() {
-        timer.update((t) => {
-            t.stop();
-            return t;
-        });
-    }
-
-    $: if ($musicContext) {
-        stopTimer();
-    }
-
     var timerIntervalid: number | null;
     var stoppables: Stoppable[] = [];
     var elapsedTime: number = 0;
     var timerPosX: number = 0;
-    timer.subscribe((t) => {
-        if (t.playing) {
+    $effect(() => {
+        if (timer.playing) {
             stoppables = [];
             for (var majorLine of grid.majorLinesPosX()) {
                 let time_at_major_line = grid.posXToTime(majorLine);
@@ -76,14 +57,14 @@
                 let time_at_minor_line = grid.posXToTime(minorLine);
                 stoppables.push(snareSound(time_at_minor_line, audioContext));
             }
-            for (var midiNote of $midiNotes) {
+            for (var midiNote of midiNotes) {
                 let time_at_midi_note = grid.posXToTime(midiNote.startPosX);
                 stoppables.push(
                     noteBlipSound(
                         time_at_midi_note,
                         frequency(
-                            $musicContext.keys[
-                                $musicContext.keys.length - midiNote.key - 1
+                            musicContext.keys[
+                                musicContext.keys.length - midiNote.key - 1
                             ],
                         ),
                         audioContext,
@@ -91,10 +72,10 @@
                 );
             }
             timerIntervalid = setInterval(() => {
-                elapsedTime = t.getElapsedSeconds();
+                elapsedTime = timer.getElapsedSeconds();
                 timerPosX = grid.timeToPosX(elapsedTime);
                 if (timerPosX > grid.totalWidth()) {
-                    stopTimer();
+                    timer.stop()
                 }
             }, 10);
         } else {
@@ -109,10 +90,10 @@
     });
 
     function handlePlayClick() {
-        if ($timer.playing) {
-            stopTimer();
+        if (timer.playing) {
+            timer.stop();
         } else {
-            startTimer();
+            timer.start();
         }
     }
 </script>
@@ -122,7 +103,7 @@
 
     <div class="mt-1 flex ml-2 py-2">
         <Keyboard
-            keys={$musicContext.keys}
+            keys={musicContext.keys}
             {keyHeight}
             width={30}
             playNote={playNoteThrottled}
@@ -141,10 +122,10 @@
 <button
     type="button"
     class="flex items-center jusitfy-center border-2 border-gray-200 hover:bg-gray-200 border-r-0 border-t-0 border-b-0 px-2"
-    on:click={() => {
+    onclick={() => {
         handlePlayClick();
     }}
-    >{#if !$timer.playing}
+    >{#if !timer.playing}
         <svg
             width="16"
             height="16"

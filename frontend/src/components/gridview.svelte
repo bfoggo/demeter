@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { afterUpdate, onMount } from "svelte";
+    import { onMount } from "svelte";
     import type { PianoRollGrid, PianoRollNote } from "../types/pianoRoll";
     import type { PlaybackTimer } from "../types/playback";
     import type { HexString, Note } from "../types/note";
@@ -7,36 +7,37 @@
     import MidiNotesView from "./midinotesview.svelte";
     import { pianoRollColor } from "../types/note";
 
-    export let grid: PianoRollGrid;
-    export let playbackTimer: Writable<PlaybackTimer>;
-    export let reverseKeys: Note[];
-    export let playNote: (note: Note) => void;
-    export let midiNotes: Writable<Set<PianoRollNote>>;
+    let {
+        grid,
+        playbackTimer,
+        reverseKeys,
+        playNote,
+        midiNotes,
+    }: {
+        grid: PianoRollGrid;
+        playbackTimer: PlaybackTimer;
+        reverseKeys: Note[];
+        playNote: (note: Note) => void;
+        midiNotes: Set<PianoRollNote>;
+    } = $props();
 
     var gridEle: HTMLElement;
     var snapPoint: number;
-
     onMount(() => {
         snapPoint = gridEle.clientWidth;
-        playbackTimer.subscribe((t) => {
-            if (!t.playing) {
-                gridEle.scrollLeft = 0;
-                snapPoint = gridEle.clientWidth;
-                return;
-            }
-        });
     });
 
-    let elapsedTime: number = 0;
-    let timerX: number = 0;
-
-    let gridUpdateIntervalid = setInterval(() => {
-        elapsedTime = $playbackTimer.getElapsedSeconds();
+    let timerX: number = $state(0);
+    var elapsedTime;
+    setInterval(() => {
+        elapsedTime = playbackTimer.getElapsedSeconds();
         timerX = grid.timeToPosX(elapsedTime);
     });
 
-    afterUpdate(() => {
-        if (!$playbackTimer.playing) {
+    $effect(() => {
+        if (!playbackTimer.playing) {
+            gridEle.scrollLeft = 0;
+            snapPoint = gridEle.clientWidth;
             return;
         }
         if (timerX > snapPoint) {
@@ -57,7 +58,7 @@
         <div
             class="bg-violet-300 opacity-30 h-full w-2 absolute top-0 left-0"
             style="width: {timerX}px; z-index: 1;"
-        />
+        ></div>
         {#each grid.majorLinesPosX() as posX, i}
             <div
                 class="majorLine top-0"
@@ -78,9 +79,9 @@
                     style="position: absolute; left: {posX}px; top: {keyIndex *
                         grid.keyHeight}px; height: {grid.keyHeight}px; width: {grid.divisionLength()}px;
                             "
-                    on:dblclick={() => {
+                    ondblclick={() => {
                         playNote(key);
-                        $midiNotes.add({
+                        midiNotes.add({
                             key: keyIndex,
                             startPosX: posX,
                             startPosY: keyIndex * grid.keyHeight,
@@ -88,25 +89,26 @@
                         });
                         midiNotes = midiNotes;
                     }}
-                    on:dragover={(e) => {
+                    ondragover={(e) => {
                         e.preventDefault();
                         if (e.target instanceof HTMLElement) {
                             e.target.style.backgroundColor = "#E5E7EB";
                             playNote(reverseKeys[keyIndex]);
                         }
                     }}
-                    on:dragleave={(e) => {
+                    ondragleave={(e) => {
                         if (e.target instanceof HTMLElement) {
                             e.target.style.backgroundColor = "";
                         }
                     }}
-                    on:drop={(e) => {
+                    ondrop={(e) => {
                         e.preventDefault();
                         if (e.target instanceof HTMLElement) {
                             e.target.style.backgroundColor = "";
                         }
                     }}
-                />
+                >
+                </div>
             {/each}
         {/each}
         {#each reverseKeys as key, keyIndex}

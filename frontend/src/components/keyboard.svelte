@@ -1,13 +1,15 @@
 <script lang="ts">
     import type { Note, NoteName } from "../types/note";
     import type { HexString } from "../types/note";
-    export let keys: Note[];
-    export let keyHeight: number;
-    export let width: number;
-    export let playNote: (note: Note) => void;
-    export let noteColors: (note: NoteName) => HexString;
+    let {keys, keyHeight, width, playNote, noteColors}: {
+        keys: Note[];
+        keyHeight: number;
+        width: number;
+        playNote: (note: Note) => void;
+        noteColors: (note: NoteName) => HexString;
+    } = $props();
 
-    $: reverseKeys = keys.slice().reverse();
+    let reverseKeys = $derived(keys.slice().reverse());
 </script>
 
 <div
@@ -22,7 +24,7 @@
             class="border-2 border-black border-r-0 cursor-pointer margin-0"
             type="button"
             
-            on:mousedown={() => playNote(key)}
+            onmousedown={() => playNote(key)}
         >
         </button>
     {/each}

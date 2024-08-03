@@ -3,11 +3,13 @@
     import type { HexString, Note, NoteName} from "../types/note";
     import type { PianoRollGrid, PianoRollNote } from "../types/pianoRoll";
 
-    export let pianoRollColor: (note: NoteName) => HexString;
-    export let midiNotes: Writable<Set<PianoRollNote>>;
-    export let grid: PianoRollGrid;
-    export let reverseKeys: Note[];
-    export let playNote: (note: Note) => void;
+    let {pianoRollColor, midiNotes, grid, reverseKeys, playNote}: {
+        pianoRollColor: (note: NoteName) => HexString;
+        midiNotes: Set<PianoRollNote>;
+        grid: PianoRollGrid;
+        reverseKeys: Note[];
+        playNote: (note: Note) => void;
+    } = $props();
 
     var startX: number;
     var startY: number;
@@ -47,12 +49,12 @@
         return below;
     }
 
-    var currentElement: HTMLElement;
+    var currentElement: HTMLElement | undefined = $state();
     var colorCheckInterval: number;
 </script>
 
 <div>
-    {#each $midiNotes as midiNote}
+    {#each midiNotes as midiNote}
         <div
             bind:this={currentElement}
             draggable="true"
@@ -62,20 +64,20 @@
             style="background: {pianoRollColor(reverseKeys[midiNote.key].name)};
                         position: absolute; left: {midiNote.startPosX}px; top: {midiNote.key *
                 grid.keyHeight}px; height: {grid.keyHeight}px; width: {midiNote.duration}px;"
-            on:dblclick={() => {
-                $midiNotes.delete(midiNote);
+            ondblclick={() => {
+                midiNotes.delete(midiNote);
                 midiNotes = midiNotes;
             }}
-            on:click={() => {
+            onclick={() => {
                 playNote(reverseKeys[midiNote.key]);
             }}
-            on:keydown={(e) => {
+            onkeydown={(e) => {
                 if (e.key === "Delete") {
-                    $midiNotes.delete(midiNote);
+                    midiNotes.delete(midiNote);
                     midiNotes = midiNotes;
                 }
             }}
-            on:dragstart={(e) => {
+            ondragstart={(e) => {
                 startX = e.clientX;
                 startY = e.clientY;
                 if (e.target instanceof HTMLElement) {
@@ -83,10 +85,10 @@
                     currentElement.style.backgroundColor = "#E5E7EB";
                 }
             }}
-            on:dragover={(e) => {
+            ondragover={(e) => {
                 e.preventDefault();
             }}
-            on:dragend={(e) => {
+            ondragend={(e) => {
                 e.preventDefault();
                 clearInterval(colorCheckInterval);
                 let deltaX = e.clientX - startX;
