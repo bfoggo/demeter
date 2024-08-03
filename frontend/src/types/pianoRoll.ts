@@ -17,16 +17,9 @@ export function allDivisions(): Division[] {
     return ["Whole", "Half", "Quarter", "Eighth", "Sixteenth", "ThirtySecond"];
 }
 
-export enum Tuplet {
-    None = "None",
-    Triplet = "Triplet",
-    Quintuplet = "Quintuplet",
-    Septuplet = "Septuplet",
-    Nonuplet = "Nonuplet",
-}
-
+export type Tuplet = "None" | "Triplet" | "Quintuplet" | "Septuplet" | "Nonuplet";
 export function allTuplets(): Tuplet[] {
-    return [Tuplet.None, Tuplet.Triplet, Tuplet.Quintuplet, Tuplet.Septuplet, Tuplet.Nonuplet];
+    return ["None", "Triplet", "Quintuplet", "Septuplet", "Nonuplet"];
 }
 
 export class TimeSignature {
@@ -80,15 +73,15 @@ export class TimeSignature {
                 break;
         }
         switch (tuplet) {
-            case Tuplet.None:
+            case "None":
                 return numDivisions;
-            case Tuplet.Triplet:
+            case "Triplet":
                 return numDivisions * 3 / 2;
-            case Tuplet.Quintuplet:
+            case "Quintuplet":
                 return numDivisions * 5 / 2;
-            case Tuplet.Septuplet:
+            case "Septuplet": 
                 return numDivisions * 7 / 2;
-            case Tuplet.Nonuplet:
+            case "Nonuplet": 
                 return numDivisions * 9 / 2;
         }
         return numDivisions;
@@ -183,19 +176,19 @@ export class PianoRollGrid {
                 break;
         }
         switch (this.musicContext.tuplet) {
-            case Tuplet.None:
+            case "None":
                 divisionLength *= 1;
                 break;
-            case Tuplet.Triplet:
+            case "Triplet":
                 divisionLength *= 2 / 3;
                 break;
-            case Tuplet.Quintuplet:
+            case "Quintuplet":
                 divisionLength *= 2 / 5;
                 break;
-            case Tuplet.Septuplet:
+            case "Septuplet":
                 divisionLength *= 2 / 7;
                 break;
-            case Tuplet.Nonuplet:
+            case "Nonuplet":
                 divisionLength *= 2 / 9;
                 break;
         }

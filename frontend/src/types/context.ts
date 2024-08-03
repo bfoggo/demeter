@@ -1,7 +1,7 @@
 import type { Note, Octave } from "./note";
 import { allNotesInOctave } from "./note";
-import type { TimeSignatureDenominator , ComplexityPattern, Division} from "./pianoRoll";
-import { TimeSignature, Tuplet } from "./pianoRoll";
+import type { TimeSignatureDenominator , ComplexityPattern, Division, Tuplet} from "./pianoRoll";
+import { TimeSignature } from "./pianoRoll";
 
 export class MusicContext {
     numOctaves: number;
@@ -22,7 +22,7 @@ export class MusicContext {
         this.measures = 2;
         this.bpm = 120;
         this.division = "Quarter";
-        this.tuplet = Tuplet.None;
+        this.tuplet = "None";
         this._keys = Array.from({ length: this.numOctaves }, (_, i) => allNotesInOctave(this.startOctave + i as Octave),).flat();
     }
 
