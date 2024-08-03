@@ -1,10 +1,11 @@
 import type { MusicContext } from "./context";
 import type { Note } from "./note";
 
-export enum TimeSignatureDenominator {
-    Quarter = 4,
-    Eighth = 8,
+export type TimeSignatureDenominator  = 4 | 8;
+export function AllTimeSignatureDenominators(): TimeSignatureDenominator[] {
+    return [4, 8];
 }
+
 
 export enum BeatComplexity {
     Simple,
@@ -103,9 +104,9 @@ export class TimeSignature {
 
     complexityPatterns(): string[] {
         switch (this.denominator) {
-            case TimeSignatureDenominator.Quarter:
+            case 4:
                 return [Array.from({ length: this.numerator }, () => BeatComplexity.Simple)].map(pattern=>beatPatternStr(pattern));
-            case TimeSignatureDenominator.Eighth:
+            case 8:
                 var results: string[] = []
                 for (const twoThree of twosAndThreesSummingToN(this.numerator)) {
                     const pattern = Array.from({ length: twoThree.twos }, () => BeatComplexity.Simple).concat(Array.from({ length: twoThree.threes }, () => BeatComplexity.Compound));
@@ -156,38 +157,15 @@ export class TimeSignature {
     static allNumerators(): number[] {
         return [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
     }
-
-    static allDenominators(): TimeSignatureDenominator[] {
-        return [TimeSignatureDenominator.Quarter, TimeSignatureDenominator.Eighth];
-    }
 }
 
-export class PianoRollNote {
+export type PianoRollNote = {
     key: number;
     startPosX: number;
     startPosY: number;
     duration: number;
-
-    constructor(key: number, startTime: number, startPosY: number, duration: number) {
-        this.key = key;
-        this.startPosX = startTime;
-        this.startPosY = startPosY;
-        this.duration = duration;
-    }
-
 }
 
-export class PianoRollChord {
-    keys: number[];
-    startPosX: number;
-    duration: number;
-    
-    constructor(keys: number[], startTime: number, duration: number) {
-        this.keys = keys;
-        this.startPosX = startTime;
-        this.duration = duration;
-    }
-}
 
 export class PianoRollGrid {
     musicContext: MusicContext;
@@ -204,18 +182,18 @@ export class PianoRollGrid {
 
     measureWidth(): number {
         switch (this.musicContext.timeSignature.denominator) {
-            case TimeSignatureDenominator.Quarter:
+            case 4:
                 return this.musicContext.timeSignature.numerator * 2 * this.eighthNoteWidth;
-            case TimeSignatureDenominator.Eighth:
+            case 8:
                 return this.musicContext.timeSignature.numerator * this.eighthNoteWidth;
         }
     }
 
     totalWidth(): number {
         switch (this.musicContext.timeSignature.denominator) {
-            case TimeSignatureDenominator.Quarter:
+            case 4:
                 return this.musicContext.measures * this.musicContext.timeSignature.numerator * 2 * this.eighthNoteWidth;
-            case TimeSignatureDenominator.Eighth:
+            case 8:
                 return this.musicContext.measures * this.musicContext.timeSignature.numerator * this.eighthNoteWidth;
         }
     }
@@ -300,7 +278,7 @@ export class PianoRollGrid {
         let current = 0;
         for (let i = 0; i < this.musicContext.measures; i++) {
             gridLines.push(current);
-            current += timeSignature.denominator === TimeSignatureDenominator.Quarter ? timeSignature.numerator * 2 * this.eighthNoteWidth : timeSignature.numerator * this.eighthNoteWidth;
+            current += timeSignature.denominator === 4 ? timeSignature.numerator * 2 * this.eighthNoteWidth : timeSignature.numerator * this.eighthNoteWidth;
         }
         gridLines.push(current);
         return gridLines;

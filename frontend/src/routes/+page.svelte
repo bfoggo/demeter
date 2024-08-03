@@ -7,7 +7,8 @@
     import { writable, type Writable } from "svelte/store";
     import MusicSettings from "../components/musicsettings.svelte";
     import GridVeiw from "../components/gridview.svelte";
-    import { PianoRollNote, PianoRollGrid } from "../types/pianoRoll";
+    import type {PianoRollNote} from "../types/pianoRoll";
+    import { PianoRollGrid } from "../types/pianoRoll";
     import { PlaybackTimer } from "../types/playback";
     import { kickSound, snareSound, noteBlipSound } from "../types/sounds";
     import type { Stoppable } from "../types/sounds";

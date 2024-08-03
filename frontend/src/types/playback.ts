@@ -1,4 +1,5 @@
-import { TimeSignature, TimeSignatureDenominator } from "./pianoRoll";
+import type { TimeSignatureDenominator } from "./pianoRoll";
+import { TimeSignature } from "./pianoRoll";
 
 
 export class PlaybackTimer {
@@ -26,7 +27,7 @@ export class PlaybackTimer {
     }
 
     totalSeconds(timeSignature: TimeSignature, bpm: number, measures: number) {
-        if (timeSignature.denominator == TimeSignatureDenominator.Quarter) {
+        if (timeSignature.denominator == 4) {
             return measures * timeSignature.numerator / bpm * 60;
         } else {
             return measures * timeSignature.numerator / bpm * 60 / 2;

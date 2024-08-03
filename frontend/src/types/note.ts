@@ -4,7 +4,7 @@ export type Note = {
     name: NoteName;
     octave: Octave;
 };
-export function allNoteNamesFromOctave(octave: Octave, noteSet: "sharps" | "flats" = "sharps"): Note[] {
+export function allNotesInOctave(octave: Octave, noteSet: "sharps" | "flats" = "sharps"): Note[] {
     if (noteSet === "flats") {
         const strNames = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"] as NoteNameFlat[];
         return strNames.map((strName) => ({ name: { noteSet, name: strName }, octave }));

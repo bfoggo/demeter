@@ -1,5 +1,6 @@
 <script lang="ts">
     import {
+    AllTimeSignatureDenominators,
         TimeSignature,
         allDivisions,
         allTuplets,
@@ -28,7 +29,7 @@
                 defaultClass="border-none hover:bg-gray-50 w-20  text-center focus:ring-0 cursor-pointer"
             />
             <Select
-                items={TimeSignature.allDenominators().map((n) => {
+                items={AllTimeSignatureDenominators().map((n) => {
                     return { value: n, name: n };
                 })}
                 bind:value={$musicContext.timeSignature.denominator}
