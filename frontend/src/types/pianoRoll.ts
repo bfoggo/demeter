@@ -43,7 +43,7 @@ export class PianoRollGrid {
     }
 
     totalHeight(): number {
-        return this.musicContext.keys().length * this.keyHeight;
+        return this.musicContext.keys.length * this.keyHeight;
     }
 
     majorLinesPosX(): number[] {

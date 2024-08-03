@@ -16,7 +16,7 @@ export class MusicContext {
     bpm: number;
     division: Division;
     tuplet: Tuplet;
-    _keys: Note[];
+    keys: Note[];
 
     constructor() {
         this.numOctaves = 2;
@@ -27,14 +27,11 @@ export class MusicContext {
         this.bpm = 120;
         this.division = "Quarter";
         this.tuplet = "None";
-        this._keys = Array.from({ length: this.numOctaves }, (_, i) => allNotesInOctave(this.startOctave + i as Octave),).flat();
+        this.keys = Array.from({ length: this.numOctaves }, (_, i) => allNotesInOctave(this.startOctave + i as Octave),).flat();
     }
 
-    keys(): Note[] {
-        return this._keys;
-    }
-
-    reInitialiizePatternStr() {
+    reconstruct() {
         this.complexityPatternStr = complexityPatterns(this.timeSignature)[0];
+        this.keys = Array.from({ length: this.numOctaves }, (_, i) => allNotesInOctave(this.startOctave + i as Octave),).flat();
     }
 }

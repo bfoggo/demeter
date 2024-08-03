@@ -25,7 +25,7 @@
     const eighthNoteWidth = 80;
 
     $: grid = new PianoRollGrid($musicContext, keyHeight, eighthNoteWidth);
-    $: reverseKeys = $musicContext.keys().slice().reverse();
+    $: reverseKeys = $musicContext.keys.slice().reverse();
 
     var midiNotes: Writable<Set<PianoRollNote>> = writable(new Set());
 
@@ -82,8 +82,8 @@
                     noteBlipSound(
                         time_at_midi_note,
                         frequency(
-                            $musicContext.keys()[
-                                $musicContext.keys().length - midiNote.key - 1
+                            $musicContext.keys[
+                                $musicContext.keys.length - midiNote.key - 1
                             ],
                         ),
                         audioContext,
@@ -122,7 +122,7 @@
 
     <div class="mt-1 flex ml-2 py-2">
         <Keyboard
-            keys={$musicContext.keys()}
+            keys={$musicContext.keys}
             {keyHeight}
             width={30}
             playNote={playNoteThrottled}

@@ -17,7 +17,7 @@
                 })}
                 bind:value={$musicContext.timeSignature.numerator}
                 on:change={() => {
-                    $musicContext.reInitialiizePatternStr();
+                    $musicContext.reconstruct();
                 }}
                 placeholder="N"
                 size="sm"
@@ -32,7 +32,7 @@
                 size="sm"
                 defaultClass="border-none hover:bg-gray-50 select-none w-20 text-center focus:ring-0 cursor-pointer"
                 on:change={() => {
-                    $musicContext.reInitialiizePatternStr();
+                    $musicContext.reconstruct();
                 }}
             />
         </div>
