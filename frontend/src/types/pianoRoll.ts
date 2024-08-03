@@ -12,17 +12,9 @@ export function allBeatComplexities(): BeatComplexity[] {
 }
 export type ComplexityPattern = string & { __complexityPattern: never };
 
-export enum Division {
-    Whole = "Whole",
-    Half = "Half",
-    Quarter = "Quarter",
-    Eighth = "Eighth",
-    Sixteenth = "Sixteenth",
-    ThirtySecond = "ThirtySecond",
-}
-
+export type Division = "Whole" | "Half" | "Quarter" | "Eighth" | "Sixteenth" | "ThirtySecond";
 export function allDivisions(): Division[] {
-    return [Division.Whole, Division.Half, Division.Quarter, Division.Eighth, Division.Sixteenth, Division.ThirtySecond];
+    return ["Whole", "Half", "Quarter", "Eighth", "Sixteenth", "ThirtySecond"];
 }
 
 export enum Tuplet {
@@ -68,22 +60,22 @@ export class TimeSignature {
     numDivisionsPerMeasure(division: Division, tuplet: Tuplet): number {
         var numDivisions;
         switch (division) {
-            case Division.Whole:
+            case "Whole":
                 numDivisions = this.numerator / this.denominator;
                 break;
-            case Division.Half:
+            case "Half":
                 numDivisions = 2 * this.numerator / this.denominator;
                 break
-            case Division.Quarter:
+            case "Quarter":
                 numDivisions = 4 * this.numerator / this.denominator;
                 break;
-            case Division.Eighth:
+            case "Eighth":
                 numDivisions = 8 * this.numerator / this.denominator;
                 break;
-            case Division.Sixteenth:
+            case "Sixteenth":
                 numDivisions = 16 * this.numerator / this.denominator;
                 break;
-            case Division.ThirtySecond:
+            case "ThirtySecond":
                 numDivisions = 32 * this.numerator / this.denominator;
                 break;
         }
@@ -171,22 +163,22 @@ export class PianoRollGrid {
     divisionLength(): number {
         let divisionLength = this.eighthNoteWidth;
         switch (this.musicContext.division) {
-            case Division.Whole:
+            case "Whole":
                 divisionLength *= 8;
                 break;
-            case Division.Half:
+            case "Half":
                 divisionLength *= 4;
                 break;
-            case Division.Quarter:
+            case "Quarter":
                 divisionLength *= 2;
                 break;
-            case Division.Eighth:
+            case "Eighth":
                 divisionLength *= 1;
                 break;
-            case Division.Sixteenth:
+            case "Sixteenth":
                 divisionLength /= 2;
                 break;
-            case Division.ThirtySecond:
+            case "ThirtySecond":
                 divisionLength /= 4;
                 break;
         }
