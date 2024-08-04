@@ -1,9 +1,46 @@
+<script context="module">
+    export class MusicContext {
+        numOctaves: number = $state(2);
+        startOctave: number = $state(4);
+        timeSignature: TimeSignature = $state({ numerator: 4, denominator: 4 });
+        measures: number = $state(2);
+        bpm: number = $state(120);
+        division: Division = $state("Quarter");
+        tuplet: Tuplet = $state("None");
+        keys: Note[] = $state(allNotesInOctave(4));
+        complexityPattern: string = $state(complexityPatterns(this.timeSignature)[0]);
+    };
+</script>
+
 <script lang="ts">
-    import { allTimeSignatureNumerators, allTimeSignatureDenominators, allDivisions, allTuplets, complexityPatterns } from "../types/rhythm";
+    import {
+        allTimeSignatureNumerators,
+        allTimeSignatureDenominators,
+        allDivisions,
+        allTuplets,
+        complexityPatterns,
+        type TimeSignature,
+        type Division,
+        type Tuplet,
+    } from "../types/rhythm";
     import Select from "flowbite-svelte/Select.svelte";
-    import type { MusicContext } from "../types/context";
     import Input from "flowbite-svelte/Input.svelte";
-    let {musicContext}: {musicContext: MusicContext} = $props();
+    import { allNotesInOctave, type Note, type Octave } from "../types/note";
+
+    let {
+        musicContext = $bindable(),
+    }: {
+        musicContext: MusicContext;
+    } = $props();
+
+    $effect(() => {
+        musicContext.complexityPattern = complexityPatterns(
+            musicContext.timeSignature,
+        )[0];
+    });
+    $effect(() => {
+        musicContext.keys = allNotesInOctave(musicContext.startOctave as Octave);
+    });
 </script>
 
 <div class="inline-flex ml-2 mt-2 h-10">
@@ -15,9 +52,6 @@
                     return { value: n, name: n };
                 })}
                 bind:value={musicContext.timeSignature.numerator}
-                on:change={() => {
-                    musicContext.reconstruct();
-                }}
                 placeholder="N"
                 size="sm"
                 defaultClass="border-none hover:bg-gray-50 w-20  text-center focus:ring-0 cursor-pointer"
@@ -30,9 +64,6 @@
                 placeholder="D"
                 size="sm"
                 defaultClass="border-none hover:bg-gray-50 select-none w-20 text-center focus:ring-0 cursor-pointer"
-                on:change={() => {
-                    musicContext.reconstruct();
-                }}
             />
         </div>
         <div
@@ -45,7 +76,7 @@
                         return { value: n, name: n };
                     },
                 )}
-                bind:value={musicContext.complexityPatternStr}
+                bind:value={musicContext.complexityPattern}
                 placeholder="complexity pattern"
                 size="sm"
                 defaultClass="border-none hover:bg-gray-50 select-none w-40 text-center focus:ring-0 cursor-pointer"

@@ -31,6 +31,7 @@ export class PianoRollGrid {
             case 8:
                 return this.musicContext.timeSignature.numerator * this.eighthNoteWidth;
         }
+        throw new Error("Unreachable");
     }
 
     totalWidth(): number {
@@ -40,6 +41,7 @@ export class PianoRollGrid {
             case 8:
                 return this.musicContext.measures * this.musicContext.timeSignature.numerator * this.eighthNoteWidth;
         }
+        throw new Error("Unreachable");
     }
 
     totalHeight(): number {
@@ -49,7 +51,7 @@ export class PianoRollGrid {
     majorLinesPosX(): number[] {
         var gridLines: number[] = [];
         let current = 0;
-        for (const complexity of this.musicContext.complexityPatternStr) {
+        for (const complexity of this.musicContext.complexityPattern) {
             gridLines.push(current);
             if (complexity === "S") {
                 current += 2 * this.eighthNoteWidth;

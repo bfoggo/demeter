@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import type { Note } from "../types/note";
     import { pianoRollColor, frequency } from "../types/note";
-    import { MusicContext } from "../types/context";
+    import {MusicContext} from "../components/musicsettings.svelte";
     import Keyboard from "../components/keyboard.svelte";
     import MusicSettings from "../components/musicsettings.svelte";
     import GridVeiw from "../components/gridview.svelte";
@@ -17,7 +17,8 @@
     onMount(() => {
         audioContext = new AudioContext();
     });
-    let musicContext = $state(new MusicContext());
+    let musicContext: MusicContext = $state(new MusicContext());
+    $inspect(musicContext);
     let timer = $state(new PlaybackTimer());
     const keyHeight = 20;
     const eighthNoteWidth = 80;
@@ -75,7 +76,7 @@
                 elapsedTime = timer.getElapsedSeconds();
                 timerPosX = grid.timeToPosX(elapsedTime);
                 if (timerPosX > grid.totalWidth()) {
-                    timer.stop()
+                    timer.stop();
                 }
             }, 10);
         } else {
@@ -99,7 +100,7 @@
 </script>
 
 <div class="divide-y-2">
-    <MusicSettings {musicContext} />
+    <MusicSettings bind:musicContext />
 
     <div class="mt-1 flex ml-2 py-2">
         <Keyboard
