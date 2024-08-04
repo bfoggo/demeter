@@ -13,27 +13,30 @@
 </script>
 
 <script lang="ts">
-    import type { PlaybackTimer } from "../types/playback";
+    import { PlaybackTimer } from "../components/timer.svelte";
     import type { Note } from "../types/note";
-    import { frequency, pianoRollColor } from "../types/note";
+    import { pianoRollColor } from "../types/note";
     import type { MusicContext } from "../components/musicsettings.svelte";
     import { numDivisionsPerMeasure } from "../types/rhythm";
     import type { Stoppable } from "../types/sounds";
-    import { kickSound, snareSound, noteBlipSound } from "../types/sounds";
-    
+    import BeatsPlayback from "./beatsPlayback.svelte";
+
     let {
-        audioContext,
         musicContext,
         grid,
         playbackTimer,
         playClickedNote,
     }: {
-        audioContext: AudioContext;
         musicContext: MusicContext;
         grid: PianoRollGrid;
         playbackTimer: PlaybackTimer;
         playClickedNote: (note: Note) => void;
     } = $props();
+
+    var audioContext: AudioContext;
+    $effect(() => {
+        audioContext = new AudioContext();
+    });
 
     let measureWidth = $derived.by(() => {
         switch (musicContext.timeSignature.denominator) {
@@ -179,14 +182,6 @@
         return (time / 60) * musicContext.bpm * (grid.eighthNoteWidth * 2);
     }
 
-    function keyToPosY(key: number): number {
-        return key * grid.keyHeight;
-    }
-
-    function posYToKey(posY: number): number {
-        return Math.floor(posY / grid.keyHeight);
-    }
-
     function minorLineAt(posX: number): number {
         if (posX < 0) {
             return 0;
@@ -229,13 +224,13 @@
     });
 
     let timerX: number = $state(0);
-    var elapsedTime;
-    var timerIntervalid: number | null;
     var stoppables: Stoppable[] = [];
-    var timerPosX: number = 0;
     setInterval(() => {
-        elapsedTime = playbackTimer.getElapsedSeconds();
+        let elapsedTime = playbackTimer.getElapsedSeconds();
         timerX = timeToPosX(elapsedTime);
+        if (timerX > totalWidth) {
+            playbackTimer.stop();
+        }
     }, 10);
 
     $effect(() => {
@@ -255,49 +250,6 @@
 
     let midiNotes = $state(new Set<PianoRollNote>());
     var currentMidiNote: HTMLElement | undefined;
-
-    $effect(() => {
-        if (playbackTimer.playing) {
-            stoppables = [];
-            for (var majorLine of majorLinesPosX) {
-                let time_at_major_line = posXToTime(majorLine);
-                stoppables.push(kickSound(time_at_major_line, audioContext));
-            }
-            for (var minorLine of minorLinesPosX) {
-                let time_at_minor_line = posXToTime(minorLine);
-                stoppables.push(snareSound(time_at_minor_line, audioContext));
-            }
-            for (var midiNote of midiNotes) {
-                let time_at_midi_note = posXToTime(midiNote.startPosX);
-                stoppables.push(
-                    noteBlipSound(
-                        time_at_midi_note,
-                        frequency(
-                            musicContext.keys[
-                                musicContext.keys.length - midiNote.key - 1
-                            ],
-                        ),
-                        audioContext,
-                    ),
-                );
-            }
-            timerIntervalid = setInterval(() => {
-                elapsedTime = playbackTimer.getElapsedSeconds();
-                timerPosX = timeToPosX(elapsedTime);
-                if (timerPosX > totalWidth) {
-                    playbackTimer.stop();
-                }
-            }, 10);
-        } else {
-            timerPosX = 0;
-            if (timerIntervalid) {
-                clearInterval(timerIntervalid);
-            }
-            for (var stoppable of stoppables) {
-                stoppable.stop();
-            }
-        }
-    });
 
     let reverseKeys = $derived.by(() => musicContext.keys.slice().reverse());
     var dragStartX: number;
@@ -443,6 +395,11 @@
         </div>
     </div>
 </div>
+<BeatsPlayback
+    {playbackTimer}
+    majorLinesTimeX={majorLinesPosX.map((posX) => posXToTime(posX))}
+    minorLinesTimeX={minorLinesPosX.map((posX) => posXToTime(posX))}
+></BeatsPlayback>
 
 <style>
     .measureLine {

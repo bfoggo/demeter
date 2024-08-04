@@ -5,12 +5,12 @@
     import Keyboard from "../components/keyboard.svelte";
     import MusicSettings from "../components/musicsettings.svelte";
     import GridVeiw from "../components/gridview.svelte";
-    import { PlaybackTimer } from "../types/playback";
+    import { PlaybackTimer } from "../components/timer.svelte";
     import { noteBlipSound } from "../types/sounds";
     import CircleOfFifths from "../components/circleOfFifths.svelte";
 
     
-    var audioContext: AudioContext;
+    var audioContext: AudioContext
     $effect(() => {
         audioContext = new AudioContext();
     });
@@ -53,7 +53,6 @@
             noteColors={pianoRollColor}
         />
         <GridVeiw
-            {audioContext}
             {musicContext}
             grid={{ keyHeight, eighthNoteWidth }}
             playbackTimer={timer}
