@@ -244,7 +244,7 @@
     });
 
     let midiNotes = $state(new SvelteSet<PianoRollNote>());
-    let hoveredOverNote: HTMLElement | null = $state.frozen(null);
+    let hoveredOverNote: HTMLElement | null = $state(null);
 
     let reverseKeys = $derived.by(() => musicContext.keys.slice().reverse());
     var dragStartX: number;
