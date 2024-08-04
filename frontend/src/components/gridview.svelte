@@ -220,7 +220,6 @@
     });
 
     let timerX: number = $state(0);
-    var stoppables: Stoppable[] = [];
     setInterval(() => {
         let elapsedTime = playbackTimer.getElapsedSeconds();
         timerX = timeToPosX(elapsedTime);
@@ -245,7 +244,7 @@
     });
 
     let midiNotes = $state(new SvelteSet<PianoRollNote>());
-    var currentMidiNote: HTMLElement | undefined;
+    let hoveredOverNote: HTMLElement | null = $state.frozen(null);
 
     let reverseKeys = $derived.by(() => musicContext.keys.slice().reverse());
     var dragStartX: number;
@@ -289,7 +288,6 @@
                             startPosY: keyIndex * grid.keyHeight,
                             duration: divisionLength,
                         });
-                        console.log(midiNotes);
                     }}
                     ondragover={(e) => {
                         e.preventDefault();
@@ -338,7 +336,6 @@
         <div>
             {#each midiNotes as midiNote}
                 <div
-                    bind:this={currentMidiNote}
                     draggable="true"
                     role="button"
                     tabindex="-1"
@@ -365,8 +362,8 @@
                         dragStartX = e.clientX;
                         dragStartY = e.clientY;
                         if (e.target instanceof HTMLElement) {
-                            currentMidiNote = e.target;
-                            currentMidiNote.style.backgroundColor = "#E5E7EB";
+                            hoveredOverNote = e.target;
+                            hoveredOverNote.style.backgroundColor = "#E5E7EB";
                         }
                     }}
                     ondragover={(e) => {
@@ -378,13 +375,18 @@
                         let deltaY = e.clientY - dragStartY;
                         let leftLine = minorLineAt(midiNote.startPosX + deltaX);
                         let key = keyAt(midiNote.startPosY + deltaY);
-                        midiNote.startPosX = leftLine * divisionLength;
-                        midiNote.key = key;
-                        midiNote.startPosY = key * grid.keyHeight;
-                        midiNotes = midiNotes;
+                        let newMidiNote = {
+                            key: key,
+                            startPosX: leftLine * divisionLength,
+                            startPosY: key * grid.keyHeight,
+                            duration: midiNote.duration,
+                        };
+                        midiNotes.delete(midiNote);
+                        midiNotes.add(newMidiNote);
                         dragStartX = 0;
                         dragStartY = 0;
                         playClickedNote(reverseKeys[key]);
+                        hoveredOverNote = null;
                     }}
                 ></div>
             {/each}
