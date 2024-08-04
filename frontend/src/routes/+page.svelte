@@ -16,7 +16,6 @@
     });
     let musicContext: MusicContext = $state(new MusicContext());
     let timer = $state(new PlaybackTimer());
-    $inspect(timer)
     const keyHeight = 20;
     const eighthNoteWidth = 80;
 

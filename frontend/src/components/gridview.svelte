@@ -33,11 +33,6 @@
         playClickedNote: (note: Note) => void;
     } = $props();
 
-    var audioContext: AudioContext;
-    $effect(() => {
-        audioContext = new AudioContext();
-    });
-
     let measureWidth = $derived.by(() => {
         switch (musicContext.timeSignature.denominator) {
             case 4:

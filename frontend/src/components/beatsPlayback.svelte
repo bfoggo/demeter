@@ -19,7 +19,6 @@
 
     var stoppables: Stoppable[] = [];
     $effect(() => {
-        console.log(audioContext);
         if (playbackTimer.playing) {
             stoppables = [];
             for (var majorLine of majorLinesTimeX) {
