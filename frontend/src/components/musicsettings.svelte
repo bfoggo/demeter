@@ -1,4 +1,4 @@
-<script context="module">
+<script context="module" lang="ts">
     export class MusicContext {
         numOctaves: number = $state(2);
         startOctave: number = $state(4);

@@ -2,14 +2,15 @@
     import { onMount } from "svelte";
     import type { Note } from "../types/note";
     import { pianoRollColor, frequency } from "../types/note";
-    import {MusicContext} from "../components/musicsettings.svelte";
+    import { MusicContext } from "../components/musicsettings.svelte";
     import Keyboard from "../components/keyboard.svelte";
     import MusicSettings from "../components/musicsettings.svelte";
     import GridVeiw from "../components/gridview.svelte";
-    import type { PianoRollNote } from "../types/pianoRoll";
-    import { PianoRollGrid } from "../types/pianoRoll";
+    import type {
+        PianoRollNote,
+    } from "../components/gridview.svelte";
     import { PlaybackTimer } from "../types/playback";
-    import { kickSound, snareSound, noteBlipSound } from "../types/sounds";
+    import { noteBlipSound } from "../types/sounds";
     import type { Stoppable } from "../types/sounds";
     import CircleOfFifths from "../components/circleOfFifths.svelte";
 
@@ -18,13 +19,10 @@
         audioContext = new AudioContext();
     });
     let musicContext: MusicContext = $state(new MusicContext());
-    $inspect(musicContext);
     let timer = $state(new PlaybackTimer());
     const keyHeight = 20;
     const eighthNoteWidth = 80;
-    let grid = $derived(
-        new PianoRollGrid(musicContext, keyHeight, eighthNoteWidth),
-    );
+
     let reverseKeys = $derived(musicContext.keys.slice().reverse());
     var midiNotes: Set<PianoRollNote> = $state(new Set());
 
@@ -42,53 +40,6 @@
             playbackTimeouts.delete(note);
         }, 500);
     }
-
-    var timerIntervalid: number | null;
-    var stoppables: Stoppable[] = [];
-    var elapsedTime: number = 0;
-    var timerPosX: number = 0;
-    $effect(() => {
-        if (timer.playing) {
-            stoppables = [];
-            for (var majorLine of grid.majorLinesPosX()) {
-                let time_at_major_line = grid.posXToTime(majorLine);
-                stoppables.push(kickSound(time_at_major_line, audioContext));
-            }
-            for (var minorLine of grid.minorLinesPosX()) {
-                let time_at_minor_line = grid.posXToTime(minorLine);
-                stoppables.push(snareSound(time_at_minor_line, audioContext));
-            }
-            for (var midiNote of midiNotes) {
-                let time_at_midi_note = grid.posXToTime(midiNote.startPosX);
-                stoppables.push(
-                    noteBlipSound(
-                        time_at_midi_note,
-                        frequency(
-                            musicContext.keys[
-                                musicContext.keys.length - midiNote.key - 1
-                            ],
-                        ),
-                        audioContext,
-                    ),
-                );
-            }
-            timerIntervalid = setInterval(() => {
-                elapsedTime = timer.getElapsedSeconds();
-                timerPosX = grid.timeToPosX(elapsedTime);
-                if (timerPosX > grid.totalWidth()) {
-                    timer.stop();
-                }
-            }, 10);
-        } else {
-            timerPosX = 0;
-            if (timerIntervalid) {
-                clearInterval(timerIntervalid);
-            }
-            for (var stoppable of stoppables) {
-                stoppable.stop();
-            }
-        }
-    });
 
     function handlePlayClick() {
         if (timer.playing) {
@@ -111,11 +62,12 @@
             noteColors={pianoRollColor}
         />
         <GridVeiw
-            {grid}
+            {audioContext}
+            {musicContext}
+            grid={{ keyHeight, eighthNoteWidth }}
             playbackTimer={timer}
             {midiNotes}
             playNote={playNoteThrottled}
-            {reverseKeys}
         />
         <CircleOfFifths />
     </div>

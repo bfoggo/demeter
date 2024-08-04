@@ -1,38 +1,210 @@
+<script context="module" lang="ts">
+    export type PianoRollNote = {
+        key: number;
+        startPosX: number;
+        startPosY: number;
+        duration: number;
+    };
+
+    export type PianoRollGrid = {
+        keyHeight: number;
+        eighthNoteWidth: number;
+    };
+</script>
+
 <script lang="ts">
-    import { onMount } from "svelte";
-    import type { PianoRollGrid, PianoRollNote } from "../types/pianoRoll";
     import type { PlaybackTimer } from "../types/playback";
-    import type { HexString, Note } from "../types/note";
-    import type { Writable } from "svelte/store";
+    import type { Note } from "../types/note";
     import MidiNotesView from "./midinotesview.svelte";
-    import { pianoRollColor } from "../types/note";
+    import { frequency, pianoRollColor } from "../types/note";
+    import type { MusicContext } from "../components/musicsettings.svelte";
+    import { numDivisionsPerMeasure } from "../types/rhythm";
+    import type { Stoppable } from "../types/sounds";
+    import { kickSound, snareSound, noteBlipSound } from "../types/sounds";
 
     let {
+        audioContext,
+        musicContext,
         grid,
         playbackTimer,
-        reverseKeys,
         playNote,
         midiNotes,
     }: {
+        audioContext: AudioContext;
+        musicContext: MusicContext;
         grid: PianoRollGrid;
         playbackTimer: PlaybackTimer;
-        reverseKeys: Note[];
         playNote: (note: Note) => void;
         midiNotes: Set<PianoRollNote>;
     } = $props();
 
+    let measureWidth = $derived.by(() => {
+        switch (musicContext.timeSignature.denominator) {
+            case 4:
+                return (
+                    musicContext.timeSignature.numerator *
+                    2 *
+                    grid.eighthNoteWidth
+                );
+            case 8:
+                return (
+                    musicContext.timeSignature.numerator * grid.eighthNoteWidth
+                );
+        }
+    });
+
+    let totalWidth = $derived.by(() => {
+        switch (musicContext.timeSignature.denominator) {
+            case 4:
+                return (
+                    musicContext.measures *
+                    musicContext.timeSignature.numerator *
+                    2 *
+                    grid.eighthNoteWidth
+                );
+            case 8:
+                return (
+                    musicContext.measures *
+                    musicContext.timeSignature.numerator *
+                    grid.eighthNoteWidth
+                );
+        }
+    });
+
+    let totalHeight = $derived(musicContext.keys.length * grid.keyHeight);
+    let majorLinesPosX = $derived.by(() => {
+        var gridLines: number[] = [];
+        let current = 0;
+        for (const complexity of musicContext.complexityPattern) {
+            gridLines.push(current);
+            if (complexity === "S") {
+                current += 2 * grid.eighthNoteWidth;
+            } else {
+                current += 3 * grid.eighthNoteWidth;
+            }
+        }
+        gridLines.push(current);
+        let gridLinesAllMeasures = Array.from(
+            { length: musicContext.measures },
+            (_, i) => i,
+        )
+            .map((i) =>
+                gridLines
+                    .slice(0, gridLines.length - 1)
+                    .map((l) => l + i * measureWidth),
+            )
+            .flat();
+        return gridLinesAllMeasures;
+    });
+
+    let divisionLength = $derived.by(() => {
+        let divisionLength = grid.eighthNoteWidth;
+        switch (musicContext.division) {
+            case "Whole":
+                divisionLength *= 8;
+                break;
+            case "Half":
+                divisionLength *= 4;
+                break;
+            case "Quarter":
+                divisionLength *= 2;
+                break;
+            case "Eighth":
+                divisionLength *= 1;
+                break;
+            case "Sixteenth":
+                divisionLength /= 2;
+                break;
+            case "ThirtySecond":
+                divisionLength /= 4;
+                break;
+        }
+        switch (musicContext.tuplet) {
+            case "None":
+                divisionLength *= 1;
+                break;
+            case "Triplet":
+                divisionLength *= 2 / 3;
+                break;
+            case "Quintuplet":
+                divisionLength *= 2 / 5;
+                break;
+            case "Septuplet":
+                divisionLength *= 2 / 7;
+                break;
+            case "Nonuplet":
+                divisionLength *= 2 / 9;
+                break;
+        }
+        return divisionLength;
+    });
+
+    let minorLinesPosX = $derived.by(() => {
+        const gridLines = [];
+        let current = 0;
+        for (
+            let i = 0;
+            i <
+            musicContext.measures *
+                numDivisionsPerMeasure(
+                    musicContext.timeSignature,
+                    musicContext.division,
+                    musicContext.tuplet,
+                );
+            i++
+        ) {
+            gridLines.push(current);
+            current += divisionLength;
+        }
+        return gridLines;
+    });
+
+    let measureLinesPosX = $derived.by(() => {
+        const timeSignature = musicContext.timeSignature;
+        const gridLines = [];
+        let current = 0;
+        for (let i = 0; i < musicContext.measures; i++) {
+            gridLines.push(current);
+            current +=
+                timeSignature.denominator === 4
+                    ? timeSignature.numerator * 2 * grid.eighthNoteWidth
+                    : timeSignature.numerator * grid.eighthNoteWidth;
+        }
+        gridLines.push(current);
+        return gridLines;
+    });
+
+    function posXToTime(posX: number): number {
+        return ((posX / grid.eighthNoteWidth / 2) * 60) / musicContext.bpm;
+    }
+
+    function timeToPosX(time: number): number {
+        return (time / 60) * musicContext.bpm * (grid.eighthNoteWidth * 2);
+    }
+
+    function keyToPosY(key: number): number {
+        return key * grid.keyHeight;
+    }
+
+    function posYToKey(posY: number): number {
+        return Math.floor(posY / grid.keyHeight);
+    }
+
     var gridEle: HTMLElement;
     var snapPoint: number;
-    onMount(() => {
+    $effect(() => {
         snapPoint = gridEle.clientWidth;
     });
 
     let timerX: number = $state(0);
     var elapsedTime;
+    var timerIntervalid: number | null;
+    var stoppables: Stoppable[] = [];
+    var timerPosX: number = 0;
     setInterval(() => {
         elapsedTime = playbackTimer.getElapsedSeconds();
-        timerX = grid.timeToPosX(elapsedTime);
-    });
+        timerX = timeToPosX(elapsedTime);
+    }, 10);
 
     $effect(() => {
         if (!playbackTimer.playing) {
@@ -41,34 +213,79 @@
             return;
         }
         if (timerX > snapPoint) {
-            let closestMajorLine = grid
-                .majorLinesPosX()
-                .reduce((prev, curr) => (snapPoint > curr ? curr : prev));
+            let closestMajorLine = majorLinesPosX.reduce((prev, curr) =>
+                snapPoint > curr ? curr : prev,
+            );
             gridEle.scrollLeft = closestMajorLine - 1;
             snapPoint = closestMajorLine - 1 + gridEle.clientWidth;
         }
     });
+
+    $effect(() => {
+        if (playbackTimer.playing) {
+            stoppables = [];
+            for (var majorLine of majorLinesPosX) {
+                let time_at_major_line = posXToTime(majorLine);
+                stoppables.push(kickSound(time_at_major_line, audioContext));
+            }
+            for (var minorLine of minorLinesPosX) {
+                let time_at_minor_line = posXToTime(minorLine);
+                stoppables.push(snareSound(time_at_minor_line, audioContext));
+            }
+            for (var midiNote of midiNotes) {
+                let time_at_midi_note = posXToTime(midiNote.startPosX);
+                stoppables.push(
+                    noteBlipSound(
+                        time_at_midi_note,
+                        frequency(
+                            musicContext.keys[
+                                musicContext.keys.length - midiNote.key - 1
+                            ],
+                        ),
+                        audioContext,
+                    ),
+                );
+            }
+            timerIntervalid = setInterval(() => {
+                elapsedTime = playbackTimer.getElapsedSeconds();
+                timerPosX = timeToPosX(elapsedTime);
+                if (timerPosX > totalWidth) {
+                    playbackTimer.stop();
+                }
+            }, 10);
+        } else {
+            timerPosX = 0;
+            if (timerIntervalid) {
+                clearInterval(timerIntervalid);
+            }
+            for (var stoppable of stoppables) {
+                stoppable.stop();
+            }
+        }
+    });
+
+    let reverseKeys = $derived.by(() => musicContext.keys.slice().reverse());
 </script>
 
 <div class="overflow-auto scroll-smooth pb-4 z-0" bind:this={gridEle}>
     <div
         class="z-1"
-        style="position: relative; height: {grid.totalHeight()}px; width: {grid.totalWidth()}px;"
+        style="position: relative; height: {totalHeight}px; width: {totalWidth}px;"
     >
         <div
             class="bg-violet-300 opacity-30 h-full w-2 absolute top-0 left-0"
             style="width: {timerX}px; z-index: 1;"
         ></div>
-        {#each grid.majorLinesPosX() as posX, i}
+        {#each majorLinesPosX as posX, i}
             <div
                 class="majorLine top-0"
-                style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px;"
+                style="position: absolute; width: 1px; height: {totalHeight}px; left: {posX}px;"
             ></div>
         {/each}
-        {#each grid.minorLinesPosX() as posX, i}
+        {#each minorLinesPosX as posX, i}
             <div
                 class="minorLine top-0"
-                style="position: absolute; width: 1px; height: {grid.totalHeight()}px; left: {posX}px; z-index: -1;"
+                style="position: absolute; width: 1px; height: {totalHeight}px; left: {posX}px; z-index: -1;"
             ></div>
             {#each reverseKeys as key, keyIndex}
                 <div
@@ -77,7 +294,7 @@
                     tabindex="0"
                     class="hover:bg-gray-200"
                     style="position: absolute; left: {posX}px; top: {keyIndex *
-                        grid.keyHeight}px; height: {grid.keyHeight}px; width: {grid.divisionLength()}px;
+                        grid.keyHeight}px; height: {grid.keyHeight}px; width: {divisionLength}px;
                             "
                     ondblclick={() => {
                         playNote(key);
@@ -85,7 +302,7 @@
                             key: keyIndex,
                             startPosX: posX,
                             startPosY: keyIndex * grid.keyHeight,
-                            duration: grid.divisionLength(),
+                            duration: divisionLength,
                         });
                         midiNotes = midiNotes;
                     }}
@@ -107,30 +324,29 @@
                             e.target.style.backgroundColor = "";
                         }
                     }}
-                >
-                </div>
+                ></div>
             {/each}
         {/each}
         {#each reverseKeys as key, keyIndex}
             <div
                 class="minorLine"
-                style="position: absolute; width: {grid.totalWidth()}px; height: 1px; top: {keyIndex *
+                style="position: absolute; width: {totalWidth}px; height: 1px; top: {keyIndex *
                     grid.keyHeight}px; z-index: -1;"
             ></div>
         {/each}
         <div
             class="minorLine"
-            style="position: absolute; width: {grid.totalWidth()}px; height: 1px; top: {grid.totalHeight()}px; z-index: -1;"
+            style="position: absolute; width: {totalWidth}px; height: 1px; top: {totalHeight}px; z-index: -1;"
         ></div>
-        {#each grid.measureLinesPosX() as posX, i}
+        {#each measureLinesPosX as posX, i}
             <div
                 class="measureLine top-0"
-                style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX -
+                style="position: absolute; width: 1.5px; height: {totalHeight}px; left: {posX -
                     1.5}px; z-index: 1;"
             ></div>
             <div
                 class="measureLine top-0"
-                style="position: absolute; width: 1.5px; height: {grid.totalHeight()}px; left: {posX +
+                style="position: absolute; width: 1.5px; height: {totalHeight}px; left: {posX +
                     1.5}px; z-index: 1;"
             ></div>
         {/each}

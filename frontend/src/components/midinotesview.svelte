@@ -1,6 +1,5 @@
 <script lang="ts">
     import type { HexString, Note, NoteName} from "../types/note";
-    import type { PianoRollGrid, PianoRollNote } from "../types/pianoRoll";
 
     let {pianoRollColor, midiNotes, grid, reverseKeys, playNote}: {
         pianoRollColor: (note: NoteName) => HexString;
