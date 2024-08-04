@@ -20,6 +20,7 @@
     import { numDivisionsPerMeasure } from "../types/rhythm";
     import type { Stoppable } from "../types/sounds";
     import BeatsPlayback from "./beatsPlayback.svelte";
+    import { SvelteSet } from "svelte/reactivity";
 
     let {
         musicContext,
@@ -243,7 +244,7 @@
         }
     });
 
-    let midiNotes = $state(new Set<PianoRollNote>());
+    let midiNotes = $state(new SvelteSet<PianoRollNote>());
     var currentMidiNote: HTMLElement | undefined;
 
     let reverseKeys = $derived.by(() => musicContext.keys.slice().reverse());
@@ -288,7 +289,7 @@
                             startPosY: keyIndex * grid.keyHeight,
                             duration: divisionLength,
                         });
-                        midiNotes = midiNotes;
+                        console.log(midiNotes);
                     }}
                     ondragover={(e) => {
                         e.preventDefault();
