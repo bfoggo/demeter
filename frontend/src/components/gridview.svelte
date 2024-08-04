@@ -15,7 +15,6 @@
 <script lang="ts">
     import type { PlaybackTimer } from "../types/playback";
     import type { Note } from "../types/note";
-    import MidiNotesView from "./midinotesview.svelte";
     import { frequency, pianoRollColor } from "../types/note";
     import type { MusicContext } from "../components/musicsettings.svelte";
     import { numDivisionsPerMeasure } from "../types/rhythm";
