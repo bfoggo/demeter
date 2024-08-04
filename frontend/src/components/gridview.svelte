@@ -27,15 +27,13 @@
         musicContext,
         grid,
         playbackTimer,
-        playNote,
-        midiNotes,
+        playClickedNote,
     }: {
         audioContext: AudioContext;
         musicContext: MusicContext;
         grid: PianoRollGrid;
         playbackTimer: PlaybackTimer;
-        playNote: (note: Note) => void;
-        midiNotes: Set<PianoRollNote>;
+        playClickedNote: (note: Note) => void;
     } = $props();
 
     let measureWidth = $derived.by(() => {
@@ -190,6 +188,41 @@
         return Math.floor(posY / grid.keyHeight);
     }
 
+    function minorLineAt(posX: number): number {
+        if (posX < 0) {
+            return 0;
+        }
+        let left = Math.floor(posX / divisionLength);
+        let right = Math.ceil(posX / divisionLength);
+        if (left === right) {
+            return left;
+        }
+        if (
+            Math.abs(left * divisionLength - posX) <
+            Math.abs(right * divisionLength - posX)
+        ) {
+            return left;
+        }
+        return right;
+    }
+    function keyAt(posY: number): number {
+        if (posY < 0) {
+            return 0;
+        }
+        let above = Math.floor(posY / grid.keyHeight);
+        let below = Math.ceil(posY / grid.keyHeight);
+        if (above === below) {
+            return above;
+        }
+        if (
+            Math.abs(above * grid.keyHeight - posY) <
+            Math.abs(below * grid.keyHeight - posY)
+        ) {
+            return above;
+        }
+        return below;
+    }
+
     var gridEle: HTMLElement;
     var snapPoint: number;
     $effect(() => {
@@ -220,6 +253,9 @@
             snapPoint = closestMajorLine - 1 + gridEle.clientWidth;
         }
     });
+
+    let midiNotes = $state(new Set<PianoRollNote>());
+    var currentMidiNote: HTMLElement | undefined;
 
     $effect(() => {
         if (playbackTimer.playing) {
@@ -265,6 +301,8 @@
     });
 
     let reverseKeys = $derived.by(() => musicContext.keys.slice().reverse());
+    var dragStartX: number;
+    var dragStartY: number;
 </script>
 
 <div class="overflow-auto scroll-smooth pb-4 z-0" bind:this={gridEle}>
@@ -297,7 +335,7 @@
                         grid.keyHeight}px; height: {grid.keyHeight}px; width: {divisionLength}px;
                             "
                     ondblclick={() => {
-                        playNote(key);
+                        playClickedNote(key);
                         midiNotes.add({
                             key: keyIndex,
                             startPosX: posX,
@@ -310,7 +348,7 @@
                         e.preventDefault();
                         if (e.target instanceof HTMLElement) {
                             e.target.style.backgroundColor = "#E5E7EB";
-                            playNote(reverseKeys[keyIndex]);
+                            playClickedNote(reverseKeys[keyIndex]);
                         }
                     }}
                     ondragleave={(e) => {
@@ -350,13 +388,60 @@
                     1.5}px; z-index: 1;"
             ></div>
         {/each}
-        <MidiNotesView
-            {pianoRollColor}
-            {midiNotes}
-            {grid}
-            {reverseKeys}
-            {playNote}
-        />
+        <div>
+            {#each midiNotes as midiNote}
+                <div
+                    bind:this={currentMidiNote}
+                    draggable="true"
+                    role="button"
+                    tabindex="-1"
+                    class="opacity-50 hover:bg-gray-400 border-2 border-black z-2"
+                    style="background: {pianoRollColor(
+                        reverseKeys[midiNote.key].name,
+                    )};
+                                position: absolute; left: {midiNote.startPosX}px; top: {midiNote.key *
+                        grid.keyHeight}px; height: {grid.keyHeight}px; width: {midiNote.duration}px;"
+                    ondblclick={() => {
+                        midiNotes.delete(midiNote);
+                        midiNotes = midiNotes;
+                    }}
+                    onclick={() => {
+                        playClickedNote(reverseKeys[midiNote.key]);
+                    }}
+                    onkeydown={(e) => {
+                        if (e.key === "Delete") {
+                            midiNotes.delete(midiNote);
+                            midiNotes = midiNotes;
+                        }
+                    }}
+                    ondragstart={(e) => {
+                        dragStartX = e.clientX;
+                        dragStartY = e.clientY;
+                        if (e.target instanceof HTMLElement) {
+                            currentMidiNote = e.target;
+                            currentMidiNote.style.backgroundColor = "#E5E7EB";
+                        }
+                    }}
+                    ondragover={(e) => {
+                        e.preventDefault();
+                    }}
+                    ondragend={(e) => {
+                        e.preventDefault();
+                        let deltaX = e.clientX - dragStartX;
+                        let deltaY = e.clientY - dragStartY;
+                        let leftLine = minorLineAt(midiNote.startPosX + deltaX);
+                        let key = keyAt(midiNote.startPosY + deltaY);
+                        midiNote.startPosX = leftLine * divisionLength;
+                        midiNote.key = key;
+                        midiNote.startPosY = key * grid.keyHeight;
+                        midiNotes = midiNotes;
+                        dragStartX = 0;
+                        dragStartY = 0;
+                        playClickedNote(reverseKeys[key]);
+                    }}
+                ></div>
+            {/each}
+        </div>
     </div>
 </div>
 

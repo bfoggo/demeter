@@ -1,30 +1,22 @@
 <script lang="ts">
-    import { onMount } from "svelte";
     import type { Note } from "../types/note";
     import { pianoRollColor, frequency } from "../types/note";
     import { MusicContext } from "../components/musicsettings.svelte";
     import Keyboard from "../components/keyboard.svelte";
     import MusicSettings from "../components/musicsettings.svelte";
     import GridVeiw from "../components/gridview.svelte";
-    import type {
-        PianoRollNote,
-    } from "../components/gridview.svelte";
     import { PlaybackTimer } from "../types/playback";
     import { noteBlipSound } from "../types/sounds";
-    import type { Stoppable } from "../types/sounds";
     import CircleOfFifths from "../components/circleOfFifths.svelte";
 
-    var audioContext: AudioContext;
-    onMount(() => {
+    var audioContext: AudioContext = $state(new AudioContext());
+    $effect(() => {
         audioContext = new AudioContext();
     });
     let musicContext: MusicContext = $state(new MusicContext());
     let timer = $state(new PlaybackTimer());
     const keyHeight = 20;
     const eighthNoteWidth = 80;
-
-    let reverseKeys = $derived(musicContext.keys.slice().reverse());
-    var midiNotes: Set<PianoRollNote> = $state(new Set());
 
     function playNote(note: Note) {
         noteBlipSound(0.0, frequency(note), audioContext);
@@ -66,8 +58,7 @@
             {musicContext}
             grid={{ keyHeight, eighthNoteWidth }}
             playbackTimer={timer}
-            {midiNotes}
-            playNote={playNoteThrottled}
+            playClickedNote={playNoteThrottled}
         />
         <CircleOfFifths />
     </div>
