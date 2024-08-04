@@ -20,7 +20,7 @@
     import { numDivisionsPerMeasure } from "../types/rhythm";
     import type { Stoppable } from "../types/sounds";
     import { kickSound, snareSound, noteBlipSound } from "../types/sounds";
-
+    
     let {
         audioContext,
         musicContext,

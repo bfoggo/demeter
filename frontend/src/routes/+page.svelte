@@ -9,24 +9,23 @@
     import { noteBlipSound } from "../types/sounds";
     import CircleOfFifths from "../components/circleOfFifths.svelte";
 
-    var audioContext: AudioContext = $state(new AudioContext());
+    
+    var audioContext: AudioContext;
     $effect(() => {
         audioContext = new AudioContext();
     });
     let musicContext: MusicContext = $state(new MusicContext());
     let timer = $state(new PlaybackTimer());
+    $inspect(timer)
     const keyHeight = 20;
     const eighthNoteWidth = 80;
 
-    function playNote(note: Note) {
-        noteBlipSound(0.0, frequency(note), audioContext);
-    }
     var playbackTimeouts: Set<Note> = new Set();
     function playNoteThrottled(note: Note) {
         if (playbackTimeouts.has(note)) {
             return;
         }
-        playNote(note);
+        noteBlipSound(0.0, frequency(note), audioContext);
         playbackTimeouts.add(note);
         let timeoutId = setTimeout(() => {
             playbackTimeouts.delete(note);
