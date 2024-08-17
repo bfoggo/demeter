@@ -35,6 +35,7 @@
             for (var stoppable of stoppables) {
                 stoppable.stop();
             }
+            stoppables = [];
         }
-    })
+    });
 </script>

@@ -20,6 +20,7 @@
     import { numDivisionsPerMeasure } from "../types/rhythm";
     import BeatsPlayback from "./beatsPlayback.svelte";
     import { SvelteSet } from "svelte/reactivity";
+    import MidiNotesPlayback from "./midiNotesPlayback.svelte";
 
     let {
         settings,
@@ -37,14 +38,10 @@
         switch (settings.timeSignature.denominator) {
             case 4:
                 return (
-                    settings.timeSignature.numerator *
-                    2 *
-                    grid.eighthNoteWidth
+                    settings.timeSignature.numerator * 2 * grid.eighthNoteWidth
                 );
             case 8:
-                return (
-                    settings.timeSignature.numerator * grid.eighthNoteWidth
-                );
+                return settings.timeSignature.numerator * grid.eighthNoteWidth;
         }
     });
 
@@ -397,6 +394,14 @@
     majorLinesTimeX={majorLinesPosX.map((posX) => posXToTime(posX))}
     minorLinesTimeX={minorLinesPosX.map((posX) => posXToTime(posX))}
 ></BeatsPlayback>
+<MidiNotesPlayback
+    {settings}
+    {playbackTimer}
+    midiPositions={Array.from(midiNotes).map((n) => ({
+        timeX: posXToTime(n.startPosX),
+        key: n.key,
+    }))}
+></MidiNotesPlayback>
 
 <style>
     .measureLine {

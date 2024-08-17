@@ -15,27 +15,36 @@
     } = $props();
 
     var audioContext: AudioContext;
+    var stoppables: Stoppable[] = [];
+
     $effect(() => {
         audioContext = new AudioContext();
     });
 
-    var stoppables: Stoppable[];
     $effect(() => {
         if (playbackTimer.playing) {
-            for (var midiNote of midiPositions) {
-                let time_at_midi_note = midiNote.timeX;
+            for (var midi of midiPositions) {
                 stoppables.push(
                     noteBlipSound(
-                        time_at_midi_note,
+                        midi.timeX,
                         frequency(
                             settings.keys[
-                                settings.keys.length - midiNote.key - 1
+                                settings.keys.length - midi.key - 1
                             ],
                         ),
                         audioContext,
                     ),
                 );
             }
+        }
+    });
+
+    $effect(() => {
+        if (!playbackTimer.playing) {
+            for (var stoppable of stoppables) {
+                stoppable.stop();
+            }
+            stoppables = [];
         }
     });
 </script>
