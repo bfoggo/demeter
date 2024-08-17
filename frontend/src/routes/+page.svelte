@@ -7,7 +7,6 @@
     import GridVeiw from "../components/gridview.svelte";
     import { PlaybackTimer } from "../components/timer.svelte";
     import { noteBlipSound } from "../types/sounds";
-    import CircleOfFifths from "../components/circleOfFifths.svelte";
 
     
     var audioContext: AudioContext
@@ -57,7 +56,6 @@
             playbackTimer={timer}
             playClickedNote={playNoteThrottled}
         />
-        <CircleOfFifths />
     </div>
 </div>
 <button

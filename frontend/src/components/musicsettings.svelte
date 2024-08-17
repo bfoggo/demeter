@@ -7,9 +7,13 @@
         bpm: number = $state(120);
         division: Division = $state("Quarter");
         tuplet: Tuplet = $state("None");
-        keys: Note[] = $state([4, 5].map((v, _) => (allNotesInOctave(v as Octave))).flat())
-        complexityPattern: string = $state(complexityPatterns(this.timeSignature)[0]);
-    };
+        keys: Note[] = $state(
+            [4, 5].map((v, _) => allNotesInOctave(v as Octave)).flat(),
+        );
+        complexityPattern: string = $state(
+            complexityPatterns(this.timeSignature)[0],
+        );
+    }
 </script>
 
 <script lang="ts">
@@ -26,7 +30,10 @@
     import Select from "flowbite-svelte/Select.svelte";
     import Input from "flowbite-svelte/Input.svelte";
     import { allNotesInOctave, type Note, type Octave } from "../types/note";
+    import { Modal } from "flowbite-svelte";
+    import CircleOfFifths from "./circleOfFifths.svelte";
 
+    let keyModal = $state(false);
 
     let {
         settings = $bindable(),
@@ -40,8 +47,13 @@
         )[0];
     });
     $effect(() => {
-        const allOctaves = Array.from({length: settings.numOctaves}, (_, i) => (settings.startOctave + i as Octave))
-        settings.keys = allOctaves.map((o, _) => allNotesInOctave(o as Octave)).flat();
+        const allOctaves = Array.from(
+            { length: settings.numOctaves },
+            (_, i) => (settings.startOctave + i) as Octave,
+        );
+        settings.keys = allOctaves
+            .map((o, _) => allNotesInOctave(o as Octave))
+            .flat();
     });
 </script>
 
@@ -73,11 +85,9 @@
         >
             <span class="text-sm pr-1 text-nowrap">Pattern</span>
             <Select
-                items={complexityPatterns(settings.timeSignature).map(
-                    (n) => {
-                        return { value: n, name: n };
-                    },
-                )}
+                items={complexityPatterns(settings.timeSignature).map((n) => {
+                    return { value: n, name: n };
+                })}
                 bind:value={settings.complexityPattern}
                 placeholder="complexity pattern"
                 size="sm"
@@ -124,6 +134,18 @@
                 defaultClass="border-none hover:bg-gray-50 select-none w-30 text-center focus:ring-0 cursor-pointer"
                 size="sm"
             />
+        </div>
+        <div
+            class="flex items-center border-2 border-gray-100 border-r-0 border-t-0 border-b-0 px-4"
+        >
+            <button
+                onclick={() => (keyModal = true)}
+                class="text-center p-2 hover:bg-gray-50 border-2 rounded-lg"
+                >Key</button
+            >
+            <Modal title="Key Select" bind:open={keyModal}>
+                <CircleOfFifths></CircleOfFifths>
+            </Modal>
         </div>
     </div>
 </div>
