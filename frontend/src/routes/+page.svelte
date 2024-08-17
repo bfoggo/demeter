@@ -8,13 +8,28 @@
     import { PlaybackTimer } from "../components/timer.svelte";
     import { noteBlipSound } from "../types/sounds";
 
-    
-    var audioContext: AudioContext
+    var audioContext: AudioContext;
     $effect(() => {
         audioContext = new AudioContext();
     });
     let settings: Settings = $state(new Settings());
     let timer = $state(new PlaybackTimer());
+
+    $effect(() => {
+        let _ = {
+            numOctaves: settings.numOctaves,
+            startOctave: settings.startOctave,
+            timeSignature: settings.timeSignature,
+            measures: settings.measures,
+            bpm: settings.bpm,
+            division: settings.division,
+            tuplet: settings.tuplet,
+            keys: settings.keys,
+            complexityPattern: settings.complexityPattern,
+        };
+        timer.stop();
+    });
+
     const keyHeight = 20;
     const eighthNoteWidth = 80;
 

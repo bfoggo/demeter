@@ -1,6 +1,7 @@
 <script lang="ts">
     import { kickSound, snareSound, type Stoppable } from "../types/sounds";
     import type { PlaybackTimer } from "./timer.svelte";
+    import { tick } from "svelte";
 
     let {
         playbackTimer,
@@ -30,8 +31,9 @@
         }
     });
 
-    $effect(() => {
+    let stopOnTimer = (() => {
         if (!playbackTimer.playing) {
+            console.log(stoppables);
             for (var stoppable of stoppables) {
                 stoppable.stop();
             }
@@ -39,3 +41,5 @@
         }
     });
 </script>
+
+{stopOnTimer()}

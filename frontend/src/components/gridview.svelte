@@ -34,7 +34,7 @@
         playClickedNote: (note: Note) => void;
     } = $props();
 
-    let measureWidth = $derived.by(() => {
+    let measureWidth = (() => {
         switch (settings.timeSignature.denominator) {
             case 4:
                 return (
@@ -43,9 +43,9 @@
             case 8:
                 return settings.timeSignature.numerator * grid.eighthNoteWidth;
         }
-    });
+    })();
 
-    let totalWidth = $derived.by(() => {
+    let totalWidth = (() => {
         switch (settings.timeSignature.denominator) {
             case 4:
                 return (
@@ -61,10 +61,10 @@
                     grid.eighthNoteWidth
                 );
         }
-    });
+    })();
 
-    let totalHeight = $derived(settings.keys.length * grid.keyHeight);
-    let majorLinesPosX = $derived.by(() => {
+    let totalHeight = settings.keys.length * grid.keyHeight;
+    let majorLinesPosX = (() => {
         var gridLines: number[] = [];
         let current = 0;
         for (const complexity of settings.complexityPattern) {
@@ -87,9 +87,9 @@
             )
             .flat();
         return gridLinesAllMeasures;
-    });
+    })();
 
-    let divisionLength = $derived.by(() => {
+    let divisionLength = (() => {
         let divisionLength = grid.eighthNoteWidth;
         switch (settings.division) {
             case "Whole":
@@ -129,9 +129,9 @@
                 break;
         }
         return divisionLength;
-    });
+    })();
 
-    let minorLinesPosX = $derived.by(() => {
+    let minorLinesPosX = (() => {
         const gridLines = [];
         let current = 0;
         for (
@@ -149,9 +149,9 @@
             current += divisionLength;
         }
         return gridLines;
-    });
+    })();
 
-    let measureLinesPosX = $derived.by(() => {
+    let measureLinesPosX = (() => {
         const timeSignature = settings.timeSignature;
         const gridLines = [];
         let current = 0;
@@ -164,7 +164,7 @@
         }
         gridLines.push(current);
         return gridLines;
-    });
+    })();
 
     function posXToTime(posX: number): number {
         return ((posX / grid.eighthNoteWidth / 2) * 60) / settings.bpm;
