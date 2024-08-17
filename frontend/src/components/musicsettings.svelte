@@ -1,10 +1,48 @@
+<script context="module" lang="ts">
+    export class Settings {
+        numOctaves: number = $state(2);
+        startOctave: number = $state(4);
+        timeSignature: TimeSignature = $state({ numerator: 4, denominator: 4 });
+        measures: number = $state(2);
+        bpm: number = $state(120);
+        division: Division = $state("Quarter");
+        tuplet: Tuplet = $state("None");
+        keys: Note[] = $state([4, 5].map((v, _) => (allNotesInOctave(v as Octave))).flat())
+        complexityPattern: string = $state(complexityPatterns(this.timeSignature)[0]);
+    };
+</script>
+
 <script lang="ts">
-    import { allTimeSignatureNumerators, allTimeSignatureDenominators, allDivisions, allTuplets, complexityPatterns } from "../types/rhythm";
-    import type { Writable } from "svelte/store";
+    import {
+        allTimeSignatureNumerators,
+        allTimeSignatureDenominators,
+        allDivisions,
+        allTuplets,
+        complexityPatterns,
+        type TimeSignature,
+        type Division,
+        type Tuplet,
+    } from "../types/rhythm";
     import Select from "flowbite-svelte/Select.svelte";
-    import type { MusicContext } from "../types/context";
     import Input from "flowbite-svelte/Input.svelte";
-    export let musicContext: Writable<MusicContext>;
+    import { allNotesInOctave, type Note, type Octave } from "../types/note";
+
+
+    let {
+        settings = $bindable(),
+    }: {
+        settings: Settings;
+    } = $props();
+
+    $effect(() => {
+        settings.complexityPattern = complexityPatterns(
+            settings.timeSignature,
+        )[0];
+    });
+    $effect(() => {
+        const allOctaves = Array.from({length: settings.numOctaves}, (_, i) => (settings.startOctave + i as Octave))
+        settings.keys = allOctaves.map((o, _) => allNotesInOctave(o as Octave)).flat();
+    });
 </script>
 
 <div class="inline-flex ml-2 mt-2 h-10">
@@ -15,10 +53,7 @@
                 items={allTimeSignatureNumerators().map((n) => {
                     return { value: n, name: n };
                 })}
-                bind:value={$musicContext.timeSignature.numerator}
-                on:change={() => {
-                    $musicContext.reconstruct();
-                }}
+                bind:value={settings.timeSignature.numerator}
                 placeholder="N"
                 size="sm"
                 defaultClass="border-none hover:bg-gray-50 w-20  text-center focus:ring-0 cursor-pointer"
@@ -27,13 +62,10 @@
                 items={allTimeSignatureDenominators().map((n) => {
                     return { value: n, name: n };
                 })}
-                bind:value={$musicContext.timeSignature.denominator}
+                bind:value={settings.timeSignature.denominator}
                 placeholder="D"
                 size="sm"
                 defaultClass="border-none hover:bg-gray-50 select-none w-20 text-center focus:ring-0 cursor-pointer"
-                on:change={() => {
-                    $musicContext.reconstruct();
-                }}
             />
         </div>
         <div
@@ -41,12 +73,12 @@
         >
             <span class="text-sm pr-1 text-nowrap">Pattern</span>
             <Select
-                items={complexityPatterns($musicContext.timeSignature).map(
+                items={complexityPatterns(settings.timeSignature).map(
                     (n) => {
                         return { value: n, name: n };
                     },
                 )}
-                bind:value={$musicContext.complexityPatternStr}
+                bind:value={settings.complexityPattern}
                 placeholder="complexity pattern"
                 size="sm"
                 defaultClass="border-none hover:bg-gray-50 select-none w-40 text-center focus:ring-0 cursor-pointer"
@@ -57,7 +89,7 @@
         >
             <span class="text-sm pr-1 text-nowrap">BPM</span>
             <Input
-                bind:value={$musicContext.bpm}
+                bind:value={settings.bpm}
                 type="number"
                 id="bpm"
                 placeholder="bpm"
@@ -73,7 +105,7 @@
                 items={allDivisions().map((n) => {
                     return { value: n, name: n };
                 })}
-                bind:value={$musicContext.division}
+                bind:value={settings.division}
                 placeholder="division"
                 defaultClass="border-none hover:bg-gray-50 select-none w-30 text-center focus:ring-0 cursor-pointer"
                 size="sm"
@@ -87,7 +119,7 @@
                 items={allTuplets().map((n) => {
                     return { value: n, name: n };
                 })}
-                bind:value={$musicContext.tuplet}
+                bind:value={settings.tuplet}
                 placeholder="tuplet"
                 defaultClass="border-none hover:bg-gray-50 select-none w-30 text-center focus:ring-0 cursor-pointer"
                 size="sm"
