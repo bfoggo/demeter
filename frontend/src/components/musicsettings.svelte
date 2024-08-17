@@ -7,7 +7,7 @@
         bpm: number = $state(120);
         division: Division = $state("Quarter");
         tuplet: Tuplet = $state("None");
-        keys: Note[] = $state(allNotesInOctave(4));
+        keys: Note[] = $state([4, 5].map((v, _) => (allNotesInOctave(v as Octave))).flat())
         complexityPattern: string = $state(complexityPatterns(this.timeSignature)[0]);
     };
 </script>
@@ -27,6 +27,7 @@
     import Input from "flowbite-svelte/Input.svelte";
     import { allNotesInOctave, type Note, type Octave } from "../types/note";
 
+
     let {
         settings = $bindable(),
     }: {
@@ -39,7 +40,8 @@
         )[0];
     });
     $effect(() => {
-        settings.keys = allNotesInOctave(settings.startOctave as Octave);
+        const allOctaves = Array.from({length: settings.numOctaves}, (_, i) => (settings.startOctave + i as Octave))
+        settings.keys = allOctaves.map((o, _) => allNotesInOctave(o as Octave)).flat();
     });
 </script>
 

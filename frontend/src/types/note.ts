@@ -1,5 +1,8 @@
 export type NoteName = { noteSet: "sharps", name: NoteNameSharp } | { noteSet: "flats", name: NoteNameFlat };
 export type Octave = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+export function allStartOctaves(numOctaves: number): Octave[] {
+    return Array.from({length: 9 - numOctaves}, (_, i) => (i as Octave))
+}
 export type Note = {
     name: NoteName;
     octave: Octave;
