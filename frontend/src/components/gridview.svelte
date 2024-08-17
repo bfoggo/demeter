@@ -16,62 +16,61 @@
     import { PlaybackTimer } from "../components/timer.svelte";
     import type { Note } from "../types/note";
     import { pianoRollColor } from "../types/note";
-    import type { MusicContext } from "../components/musicsettings.svelte";
+    import type { Settings } from "../components/musicsettings.svelte";
     import { numDivisionsPerMeasure } from "../types/rhythm";
-    import type { Stoppable } from "../types/sounds";
     import BeatsPlayback from "./beatsPlayback.svelte";
     import { SvelteSet } from "svelte/reactivity";
 
     let {
-        musicContext,
+        settings,
         grid,
         playbackTimer,
         playClickedNote,
     }: {
-        musicContext: MusicContext;
+        settings: Settings;
         grid: PianoRollGrid;
         playbackTimer: PlaybackTimer;
         playClickedNote: (note: Note) => void;
     } = $props();
 
     let measureWidth = $derived.by(() => {
-        switch (musicContext.timeSignature.denominator) {
+        switch (settings.timeSignature.denominator) {
             case 4:
                 return (
-                    musicContext.timeSignature.numerator *
+                    settings.timeSignature.numerator *
                     2 *
                     grid.eighthNoteWidth
                 );
             case 8:
                 return (
-                    musicContext.timeSignature.numerator * grid.eighthNoteWidth
+                    settings.timeSignature.numerator * grid.eighthNoteWidth
                 );
         }
     });
 
     let totalWidth = $derived.by(() => {
-        switch (musicContext.timeSignature.denominator) {
+        switch (settings.timeSignature.denominator) {
             case 4:
                 return (
-                    musicContext.measures *
-                    musicContext.timeSignature.numerator *
+                    settings.measures *
+                    settings.timeSignature.numerator *
                     2 *
                     grid.eighthNoteWidth
                 );
             case 8:
                 return (
-                    musicContext.measures *
-                    musicContext.timeSignature.numerator *
+                    settings.measures *
+                    settings.timeSignature.numerator *
                     grid.eighthNoteWidth
                 );
         }
     });
 
-    let totalHeight = $derived(musicContext.keys.length * grid.keyHeight);
+    let totalHeight = $derived(settings.keys.length * grid.keyHeight);
     let majorLinesPosX = $derived.by(() => {
         var gridLines: number[] = [];
         let current = 0;
-        for (const complexity of musicContext.complexityPattern) {
+        for (const complexity of settings.complexityPattern) {
             gridLines.push(current);
             if (complexity === "S") {
                 current += 2 * grid.eighthNoteWidth;
@@ -81,7 +80,7 @@
         }
         gridLines.push(current);
         let gridLinesAllMeasures = Array.from(
-            { length: musicContext.measures },
+            { length: settings.measures },
             (_, i) => i,
         )
             .map((i) =>
@@ -95,7 +94,7 @@
 
     let divisionLength = $derived.by(() => {
         let divisionLength = grid.eighthNoteWidth;
-        switch (musicContext.division) {
+        switch (settings.division) {
             case "Whole":
                 divisionLength *= 8;
                 break;
@@ -115,7 +114,7 @@
                 divisionLength /= 4;
                 break;
         }
-        switch (musicContext.tuplet) {
+        switch (settings.tuplet) {
             case "None":
                 divisionLength *= 1;
                 break;
@@ -141,11 +140,11 @@
         for (
             let i = 0;
             i <
-            musicContext.measures *
+            settings.measures *
                 numDivisionsPerMeasure(
-                    musicContext.timeSignature,
-                    musicContext.division,
-                    musicContext.tuplet,
+                    settings.timeSignature,
+                    settings.division,
+                    settings.tuplet,
                 );
             i++
         ) {
@@ -156,10 +155,10 @@
     });
 
     let measureLinesPosX = $derived.by(() => {
-        const timeSignature = musicContext.timeSignature;
+        const timeSignature = settings.timeSignature;
         const gridLines = [];
         let current = 0;
-        for (let i = 0; i < musicContext.measures; i++) {
+        for (let i = 0; i < settings.measures; i++) {
             gridLines.push(current);
             current +=
                 timeSignature.denominator === 4
@@ -171,11 +170,11 @@
     });
 
     function posXToTime(posX: number): number {
-        return ((posX / grid.eighthNoteWidth / 2) * 60) / musicContext.bpm;
+        return ((posX / grid.eighthNoteWidth / 2) * 60) / settings.bpm;
     }
 
     function timeToPosX(time: number): number {
-        return (time / 60) * musicContext.bpm * (grid.eighthNoteWidth * 2);
+        return (time / 60) * settings.bpm * (grid.eighthNoteWidth * 2);
     }
 
     function minorLineAt(posX: number): number {
@@ -246,7 +245,7 @@
     let midiNotes = $state(new SvelteSet<PianoRollNote>());
     let hoveredOverNote: HTMLElement | null = $state(null);
 
-    let reverseKeys = $derived.by(() => musicContext.keys.slice().reverse());
+    let reverseKeys = $derived.by(() => settings.keys.slice().reverse());
     var dragStartX: number;
     var dragStartY: number;
 </script>

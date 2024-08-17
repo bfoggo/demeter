@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Note } from "../types/note";
     import { pianoRollColor, frequency } from "../types/note";
-    import { MusicContext } from "../components/musicsettings.svelte";
+    import { Settings } from "../components/musicsettings.svelte";
     import Keyboard from "../components/keyboard.svelte";
     import MusicSettings from "../components/musicsettings.svelte";
     import GridVeiw from "../components/gridview.svelte";
@@ -14,7 +14,7 @@
     $effect(() => {
         audioContext = new AudioContext();
     });
-    let musicContext: MusicContext = $state(new MusicContext());
+    let settings: Settings = $state(new Settings());
     let timer = $state(new PlaybackTimer());
     const keyHeight = 20;
     const eighthNoteWidth = 80;
@@ -41,18 +41,18 @@
 </script>
 
 <div class="divide-y-2">
-    <MusicSettings bind:musicContext />
+    <MusicSettings bind:settings />
 
     <div class="mt-1 flex ml-2 py-2">
         <Keyboard
-            keys={musicContext.keys}
+            keys={settings.keys}
             {keyHeight}
             width={30}
             playNote={playNoteThrottled}
             noteColors={pianoRollColor}
         />
         <GridVeiw
-            {musicContext}
+            {settings}
             grid={{ keyHeight, eighthNoteWidth }}
             playbackTimer={timer}
             playClickedNote={playNoteThrottled}

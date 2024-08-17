@@ -1,15 +1,15 @@
 <script lang="ts">
     import { frequency } from "../types/note";
     import { noteBlipSound, type Stoppable } from "../types/sounds";
-    import type { MusicContext } from "./musicsettings.svelte";
+    import type { Settings } from "./musicsettings.svelte";
     import type { PlaybackTimer } from "./timer.svelte";
 
     let {
-        musicContext,
+        settings,
         playbackTimer,
         midiPositions,
     }: {
-        musicContext: MusicContext;
+        settings: Settings;
         playbackTimer: PlaybackTimer;
         midiPositions: { timeX: number; key: number }[];
     } = $props();
@@ -28,8 +28,8 @@
                     noteBlipSound(
                         time_at_midi_note,
                         frequency(
-                            musicContext.keys[
-                                musicContext.keys.length - midiNote.key - 1
+                            settings.keys[
+                                settings.keys.length - midiNote.key - 1
                             ],
                         ),
                         audioContext,
