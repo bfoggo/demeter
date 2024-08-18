@@ -56,7 +56,7 @@
 
     let keyboardElement: HTMLElement | null = $state(null);
     $inspect(keyboardElement)
-    let keyboardWidth = $derived.by(() => (keyboardElement?.clientWidth));
+    let keyboardWidth = $derived.by(() => (keyboardElement ? keyboardElement.clientWidth : 50));
 </script>
 
 <div class="ml-2">
