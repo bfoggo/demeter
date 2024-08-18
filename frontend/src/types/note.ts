@@ -99,6 +99,26 @@ const asSharp: Map<string, string> = new Map([
 
 ]);
 
+const asFlat: Map<string, string> = new Map([
+    ["C", "C"],
+    ["C#", "Db"],
+    ["D", "D"],
+    ["D#", "Eb"],
+    ["E", "E"],
+    ["F", "F"],
+    ["F#", "Gb"],
+    ["G", "G"],
+    ["G#", "Ab"],
+    ["A", "A"],
+    ["A#", "Bb"],
+    ["B", "B"],
+    ["Db", "Db"],
+    ["Eb", "Eb"],
+    ["Gb", "Gb"],
+    ["Ab", "Ab"],
+    ["Bb", "Bb"]
+]);
+
 const sharpToIndex: Map<NoteNameSharp, number> = new Map([
     ["C" as NoteNameSharp, 0],
     ["C#" as NoteNameSharp, 1],
@@ -138,7 +158,6 @@ function noteNameIndex(note: NoteName): number {
     throw new Error("Invalid note " + note);
 }
 
-// TODO
 export type Chord = Note[];
 
 type ThirdQuality = "major" | "minor" | "sus2" | "sus4";
@@ -148,22 +167,18 @@ type NinthQuality = null | "major" | "minor" | "diminished" | "augmented";
 type EleventhQuality = null | "perfect" | "augmented";
 type ThirteenthQuality = null | "major" | "minor" | "diminished" | "augmented";
 
-class ChordGrammar {
-    root: NoteNameSharp;
-    third: ThirdQuality;
-    fifth: FifthQuality;
-    seventh: SeventhQuality;
-    ninth: NinthQuality;
-    eleventh: EleventhQuality;
-    thirteenth: ThirteenthQuality;
+type ChordGrammar = {
+    root: NoteName;
+}
 
-    constructor(root: NoteNameSharp, third: ThirdQuality, fifth: FifthQuality, seventh: SeventhQuality, ninth: NinthQuality, eleventh: EleventhQuality, thirteenth: ThirteenthQuality) {
-        this.root = root;
-        this.third = third;
-        this.fifth = fifth;
-        this.seventh = seventh;
-        this.ninth = ninth;
-        this.eleventh = eleventh;
-        this.thirteenth = thirteenth;
+export function parseChord(chord: string, asNoteSet: "sharps" | "flats"): ChordGrammar {
+    const root = chord[0].toUpperCase() 
+    const quality = (chord[1] === "#" || chord[1] === "b" ? chord[1] : "")
+    const full = root + quality
+    switch (asNoteSet) {
+        case "sharps":
+            return {root: { noteSet: asNoteSet, name: asSharp.get(full) as NoteNameSharp }} as ChordGrammar;
+        case "flats":
+            return {root: { noteSet: asNoteSet, name: asFlat.get(full) as NoteNameFlat }} as ChordGrammar;
     }
 }
