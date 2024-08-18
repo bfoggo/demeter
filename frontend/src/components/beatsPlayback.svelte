@@ -33,7 +33,6 @@
 
     let stopOnTimer = (() => {
         if (!playbackTimer.playing) {
-            console.log(stoppables);
             for (var stoppable of stoppables) {
                 stoppable.stop();
             }

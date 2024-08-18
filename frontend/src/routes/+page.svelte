@@ -15,7 +15,7 @@
     let settings: Settings = $state(new Settings());
     let timer = $state(new PlaybackTimer());
 
-    $effect(() => {
+    let stopTimerOnAnySettingsChange = (() => {
         let _ = {
             numOctaves: settings.numOctaves,
             startOctave: settings.startOctave,
@@ -104,3 +104,4 @@
         </svg>
     {/if}
 </button>
+{stopTimerOnAnySettingsChange()}

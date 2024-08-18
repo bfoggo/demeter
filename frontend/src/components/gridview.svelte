@@ -34,7 +34,7 @@
         playClickedNote: (note: Note) => void;
     } = $props();
 
-    let measureWidth = (() => {
+    let measureWidth = $derived.by(() => {
         switch (settings.timeSignature.denominator) {
             case 4:
                 return (
@@ -43,9 +43,9 @@
             case 8:
                 return settings.timeSignature.numerator * grid.eighthNoteWidth;
         }
-    })();
+    });
 
-    let totalWidth = (() => {
+    let totalWidth = $derived.by(() => {
         switch (settings.timeSignature.denominator) {
             case 4:
                 return (
@@ -61,10 +61,10 @@
                     grid.eighthNoteWidth
                 );
         }
-    })();
+    });
 
-    let totalHeight = settings.keys.length * grid.keyHeight;
-    let majorLinesPosX = (() => {
+    let totalHeight = $derived(settings.keys.length * grid.keyHeight);
+    let majorLinesPosX = $derived.by(() => {
         var gridLines: number[] = [];
         let current = 0;
         for (const complexity of settings.complexityPattern) {
@@ -87,9 +87,9 @@
             )
             .flat();
         return gridLinesAllMeasures;
-    })();
+    });
 
-    let divisionLength = (() => {
+    let divisionLength = $derived.by(() => {
         let divisionLength = grid.eighthNoteWidth;
         switch (settings.division) {
             case "Whole":
@@ -129,9 +129,9 @@
                 break;
         }
         return divisionLength;
-    })();
+    });
 
-    let minorLinesPosX = (() => {
+    let minorLinesPosX = $derived.by(() => {
         const gridLines = [];
         let current = 0;
         for (
@@ -149,9 +149,9 @@
             current += divisionLength;
         }
         return gridLines;
-    })();
+    });
 
-    let measureLinesPosX = (() => {
+    let measureLinesPosX = $derived.by(() => {
         const timeSignature = settings.timeSignature;
         const gridLines = [];
         let current = 0;
@@ -164,7 +164,7 @@
         }
         gridLines.push(current);
         return gridLines;
-    })();
+    });
 
     function posXToTime(posX: number): number {
         return ((posX / grid.eighthNoteWidth / 2) * 60) / settings.bpm;
@@ -173,6 +173,13 @@
     function timeToPosX(time: number): number {
         return (time / 60) * settings.bpm * (grid.eighthNoteWidth * 2);
     }
+
+    let majorLinesTimeX = $derived.by(() =>
+        majorLinesPosX.map((posX) => posXToTime(posX)),
+    );
+    let minorLinesTimeX = $derived.by(() =>
+        minorLinesPosX.map((posX) => posXToTime(posX)),
+    );
 
     function minorLineAt(posX: number): number {
         if (posX < 0) {
@@ -391,8 +398,8 @@
 </div>
 <BeatsPlayback
     {playbackTimer}
-    majorLinesTimeX={majorLinesPosX.map((posX) => posXToTime(posX))}
-    minorLinesTimeX={minorLinesPosX.map((posX) => posXToTime(posX))}
+    majorLinesTimeX={majorLinesTimeX}
+    minorLinesTimeX={minorLinesTimeX}
 ></BeatsPlayback>
 <MidiNotesPlayback
     {settings}
