@@ -7,6 +7,7 @@
     import GridVeiw from "../components/gridview.svelte";
     import { PlaybackTimer } from "../components/timer.svelte";
     import { noteBlipSound } from "../types/sounds";
+    import ChordsView from "../components/chordsView.svelte";
 
     var audioContext: AudioContext;
     $effect(() => {
@@ -15,7 +16,7 @@
     let settings: Settings = $state(new Settings());
     let timer = $state(new PlaybackTimer());
 
-    let stopTimerOnAnySettingsChange = (() => {
+    let stopTimerOnAnySettingsChange = () => {
         let _ = {
             numOctaves: settings.numOctaves,
             startOctave: settings.startOctave,
@@ -28,9 +29,9 @@
             complexityPattern: settings.complexityPattern,
         };
         timer.stop();
-    });
+    };
 
-    const keyHeight = 20;
+    const keyHeight = 16;
     const eighthNoteWidth = 80;
 
     var playbackTimeouts: Set<Note> = new Set();
@@ -52,18 +53,23 @@
             timer.start();
         }
     }
+
+    let keyboardElement: HTMLElement | null = $state(null);
+    $inspect(keyboardElement)
+    let keyboardWidth = $derived.by(() => (keyboardElement?.clientWidth));
 </script>
 
-<div class="divide-y-2">
+<div class="ml-2">
     <MusicSettings bind:settings />
 
-    <div class="mt-1 flex ml-2 py-2">
+    <div class="mt-1 flex py-2">
         <Keyboard
             keys={settings.keys}
             {keyHeight}
             width={30}
             playNote={playNoteThrottled}
             noteColors={pianoRollColor}
+            bind:element={keyboardElement}
         />
         <GridVeiw
             {settings}
@@ -72,36 +78,49 @@
             playClickedNote={playNoteThrottled}
         />
     </div>
+    <button
+        type="button"
+        class="flex items-center jusitfy-center border-gray-200 hover:bg-gray-200 pb-2"
+        onclick={() => {
+            handlePlayClick();
+        }}
+        >{#if !timer.playing}
+            <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M3 3.73241C3 2.54878 4.30673 1.83146 5.30531 2.46692L12.0114 6.73441C12.9376 7.32384 12.9376 8.67597 12.0114 9.2654L5.30532 13.5329C4.30673 14.1684 3 13.451 3 12.2674V3.73241Z"
+                    fill="black"
+                />
+            </svg>
+        {:else}
+            <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <rect
+                    x="3"
+                    y="3"
+                    width="10"
+                    height="10"
+                    rx="1.5"
+                    fill="black"
+                />
+            </svg>
+        {/if}
+    </button>
+    <div class="mt-1 flex py-2">
+        <div class="h-1"
+            style="width: {keyboardWidth}px;"
+        ></div>
+        <ChordsView musicSettings={settings} />
+    </div>
 </div>
-<button
-    type="button"
-    class="flex items-center jusitfy-center border-2 border-gray-200 hover:bg-gray-200 border-r-0 border-t-0 border-b-0 px-2"
-    onclick={() => {
-        handlePlayClick();
-    }}
-    >{#if !timer.playing}
-        <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <path
-                d="M3 3.73241C3 2.54878 4.30673 1.83146 5.30531 2.46692L12.0114 6.73441C12.9376 7.32384 12.9376 8.67597 12.0114 9.2654L5.30532 13.5329C4.30673 14.1684 3 13.451 3 12.2674V3.73241Z"
-                fill="black"
-            />
-        </svg>
-    {:else}
-        <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <rect x="3" y="3" width="10" height="10" rx="1.5" fill="black" />
-        </svg>
-    {/if}
-</button>
 {stopTimerOnAnySettingsChange()}

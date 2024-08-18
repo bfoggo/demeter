@@ -57,7 +57,7 @@
     });
 </script>
 
-<div class="inline-flex ml-2 mt-2 h-10">
+<div class="inline-flex mt-2 h-10">
     <div class="flex text-sm">
         <div class="pl-1 pr-4 flex items-center cursor-default">
             <span class="text-sm pr-1 text-nowrap">Time Signature</span>
@@ -140,7 +140,7 @@
         >
             <button
                 onclick={() => (keyModal = true)}
-                class="text-center p-2 hover:bg-gray-50 border-2 border-l-0 border-gray-100"
+                class="text-center p-2 hover:bg-gray-100 rounded-full ml-2"
                 >Key</button
             >
             <Modal title="Key Select" bind:open={keyModal}>
