@@ -136,11 +136,11 @@
             />
         </div>
         <div
-            class="flex items-center border-2 border-gray-100 border-r-0 border-t-0 border-b-0 px-4"
+            class="flex items-center border-2 border-gray-100 border-r-0 border-t-0 border-b-0 px-0 h-full"
         >
             <button
                 onclick={() => (keyModal = true)}
-                class="text-center p-2 hover:bg-gray-50 border-2 rounded-lg"
+                class="text-center p-2 hover:bg-gray-50 border-2 border-l-0 border-gray-100"
                 >Key</button
             >
             <Modal title="Key Select" bind:open={keyModal}>
