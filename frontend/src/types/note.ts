@@ -75,8 +75,8 @@ export function pianoRollColor(notename: NoteName): HexString {
 }
 export type HexString = String;
 
-type NoteNameSharp = "C" | "C#" | "D" | "D#" | "E" | "F" | "F#" | "G" | "G#" | "A" | "A#" | "B";
-type NoteNameFlat = "C" | "Db" | "D" | "Eb" | "E" | "F" | "Gb" | "G" | "Ab" | "A" | "Bb" | "B";
+export type NoteNameSharp = "C" | "C#" | "D" | "D#" | "E" | "F" | "F#" | "G" | "G#" | "A" | "A#" | "B";
+export type NoteNameFlat = "C" | "Db" | "D" | "Eb" | "E" | "F" | "Gb" | "G" | "Ab" | "A" | "Bb" | "B";
 
 const asSharp: Map<string, string> = new Map([
     ["C", "C"],
@@ -167,7 +167,7 @@ type NinthQuality = null | "major" | "minor" | "diminished" | "augmented";
 type EleventhQuality = null | "perfect" | "augmented";
 type ThirteenthQuality = null | "major" | "minor" | "diminished" | "augmented";
 
-type ChordGrammar = {
+export type ChordGrammar = {
     root: NoteName;
 }
 

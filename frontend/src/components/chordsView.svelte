@@ -1,12 +1,17 @@
 <script lang="ts">
-    import {Settings} from "./musicsettings.svelte";
+    import ChordBuild from "./chordBuild.svelte";
+    import ChordGrid from "./chordGrid.svelte";
+    import { Settings } from "./musicsettings.svelte";
+    import type { ChordGrammar } from "../types/note";
 
-    let {musicSettings}: {musicSettings: Settings} = $props();
+    let { musicSettings }: { musicSettings: Settings } = $props();
+    let builtChord: ChordGrammar = $state({
+        root: { noteSet: "sharps", name: "C" },
+    });
+    let parsedChord: ChordGrammar = $state({
+        root: { noteSet: "sharps", name: "C" },
+    });
 </script>
 
- <div class="w-2/3 grid grid-cols-12  auto-cols-max grid-flow-row-dense gap-1">
-    {#each Array.from({length: musicSettings.complexityPattern.length * musicSettings.measures}, (_, i) => (i)) as measure} 
-        <div class="col-span-1 h-9 border-2 border-black">
-            </div>
-    {/each}
-</div>
+<ChordGrid {musicSettings} {builtChord} {parsedChord} />
+<ChordBuild bind:builtChord></ChordBuild>

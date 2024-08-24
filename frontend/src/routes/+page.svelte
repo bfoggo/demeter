@@ -8,6 +8,7 @@
     import { PlaybackTimer } from "../components/timer.svelte";
     import { noteBlipSound } from "../types/sounds";
     import ChordsView from "../components/chordsView.svelte";
+    import ChordBuild from "../components/chordBuild.svelte";
 
     var audioContext: AudioContext;
     $effect(() => {
@@ -55,8 +56,10 @@
     }
 
     let keyboardElement: HTMLElement | null = $state(null);
-    $inspect(keyboardElement)
-    let keyboardWidth = $derived.by(() => (keyboardElement ? keyboardElement.clientWidth : 50));
+    $inspect(keyboardElement);
+    let keyboardWidth = $derived.by(() =>
+        keyboardElement ? keyboardElement.clientWidth : 50,
+    );
 </script>
 
 <div class="ml-2">
@@ -117,10 +120,8 @@
         {/if}
     </button>
     <div class="mt-1 flex py-2">
-        <div class="h-1"
-            style="width: {keyboardWidth}px;"
-        ></div>
-        <ChordsView musicSettings={settings} />
+        <div class="h-1" style="width: {keyboardWidth}px;"></div>
+        <ChordsView musicSettings={settings}></ChordsView>
     </div>
 </div>
 {stopTimerOnAnySettingsChange()}
