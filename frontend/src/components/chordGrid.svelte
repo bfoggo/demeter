@@ -52,10 +52,9 @@
         <div class="col-span-1 h-9">
             <input
                 type="text"
-                class="w-full text-center h-full text-sm"
-                
+                class="w-full text-center h-full border-none shadow-sm focus:ring-0 text-sm bg-{measure == selectedMeasure ? 'gray-200' : 'white'}"
                 value={asString(allChords[measure])}
-                onclick={(e) => {
+                onfocus={(e) => {
                     const target = e.target as HTMLInputElement;
                     if (target){
                         selectedMeasure = measure;
