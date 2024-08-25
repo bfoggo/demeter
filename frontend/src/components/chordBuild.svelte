@@ -3,7 +3,9 @@
 
     let {
         builtChord = $bindable(),
-    }: { builtChord: ChordGrammar } = $props();
+    }: { builtChord: ChordGrammar,
+     } = $props();
+
 </script>
 
 <div class="flex divide-x-1">

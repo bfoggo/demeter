@@ -6,11 +6,9 @@
 
     let {
         musicSettings,
-        builtChord,
         parsedChord = $bindable(),
     }: {
         musicSettings: Settings;
-        builtChord: ChordGrammar;
         parsedChord: ChordGrammar;
     } = $props();
 
@@ -18,7 +16,6 @@
         parsedChord = parseChord(input, "sharps");
     }
 
-    $inspect(parsedChord);
 </script>
 
 <div
@@ -29,14 +26,16 @@
             <input
                 type="text"
                 class="w-full text-center h-full text-sm"
-                value={""}
+                value={parsedChord.root.name}
                 onchange={(e) => {
                     const target = e.target as HTMLInputElement;
                     if (target){
                         parseChordInput(target.value);
                     }}
                 }
-            />
+            >
+            <input>
         </div>
+        
     {/each}
 </div>
