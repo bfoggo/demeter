@@ -182,3 +182,7 @@ export function parseChord(chord: string, asNoteSet: "sharps" | "flats"): ChordG
             return {root: { noteSet: asNoteSet, name: asFlat.get(full) as NoteNameFlat }} as ChordGrammar;
     }
 }
+
+export function asString(chord: ChordGrammar): string {
+    return chord.root.name;
+}

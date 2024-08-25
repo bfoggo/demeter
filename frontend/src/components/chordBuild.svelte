@@ -6,6 +6,16 @@
     }: { builtChord: ChordGrammar,
      } = $props();
 
+     function setRoot(note: NoteNameSharp) {
+        const oldChord = $state.snapshot(builtChord);
+        builtChord = {
+            ...oldChord,
+            root: { noteSet: "sharps", name: note },
+        };
+     }
+
+
+
 </script>
 
 <div class="flex divide-x-1">
@@ -19,9 +29,7 @@
                         ? 'gray'
                         : 'white'}"
                     onclick={() => {
-                        builtChord = {
-                            root: { noteSet: "sharps", name: note as NoteNameSharp },
-                        };
+                        setRoot(note as NoteNameSharp);
                     }}>{note}</button
                 >
             </div>
