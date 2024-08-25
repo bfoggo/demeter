@@ -186,3 +186,7 @@ export function parseChord(chord: string, asNoteSet: "sharps" | "flats"): ChordG
 export function asString(chord: ChordGrammar): string {
     return chord.root.name;
 }
+
+export function toNotes(grammar: ChordGrammar): Chord {
+    return [{name: grammar.root, octave: 4}]
+}

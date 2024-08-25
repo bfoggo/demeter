@@ -7,13 +7,14 @@
     let {
         musicSettings,
         parsedChord = $bindable(),
+        allChords = $bindable(),
     }: {
         musicSettings: Settings;
         parsedChord: ChordGrammar;
+        allChords: ChordGrammar[];
     } = $props();
 
     let selectedMeasure = $state(0);
-    let allChords: ChordGrammar[] = $state([]);
 
     function parseChordInput(input: string, idx: number) {
         parsedChord = parseChord(input, "sharps");

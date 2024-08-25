@@ -56,7 +56,6 @@
     }
 
     let keyboardElement: HTMLElement | null = $state(null);
-    $inspect(keyboardElement);
     let keyboardWidth = $derived.by(() =>
         keyboardElement ? keyboardElement.clientWidth : 50,
     );
@@ -121,7 +120,7 @@
     </button>
     <div class="mt-1 flex py-2">
         <div class="h-1" style="width: {keyboardWidth}px;"></div>
-        <ChordsView musicSettings={settings}></ChordsView>
+        <ChordsView musicSettings={settings} playbackTimer={timer}></ChordsView>
     </div>
 </div>
 {stopTimerOnAnySettingsChange()}

@@ -14,6 +14,26 @@
             complexityPatterns(this.timeSignature)[0],
         );
     }
+
+    export function majorTimes(settings: Settings): number[] {
+        const times = [];
+        let curr_time = 0;
+        for (let i = 0; i < settings.measures; i++) {
+            for (const complexity of settings.complexityPattern) {
+                times.push(curr_time);
+                switch (complexity) {
+                    case "S":
+                        curr_time += 60 / settings.bpm;
+                        break;
+                    case "C":
+                        curr_time += (60 / settings.bpm) * 1.5;
+                        break;
+                }
+            }
+        }
+        console.log(times);
+        return times;
+    }
 </script>
 
 <script lang="ts">
