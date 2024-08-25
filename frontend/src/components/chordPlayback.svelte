@@ -17,8 +17,6 @@
     var audioContext: AudioContext;
     var stoppables: Stoppable[] = [];
 
-    $inspect(chordPositions)
-
     $effect(() => {
         audioContext = new AudioContext();
     });
