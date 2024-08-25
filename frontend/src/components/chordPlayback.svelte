@@ -1,6 +1,6 @@
 <script lang="ts">
     import { frequency, toNotes, type ChordGrammar } from "../types/note";
-    import { noteBlipSound, type Stoppable } from "../types/sounds";
+    import { noteLushSound, type Stoppable } from "../types/sounds";
     import type { Settings } from "./musicsettings.svelte";
     import type { PlaybackTimer } from "./timer.svelte";
 
@@ -26,7 +26,7 @@
             for (var chord of chordPositions) {
                 for (var note of toNotes(chord.chord))
                     stoppables.push(
-                        noteBlipSound(
+                        noteLushSound(
                             chord.timeX,
                             frequency(note),
                             audioContext,

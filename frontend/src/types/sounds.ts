@@ -45,7 +45,7 @@ export class ADSR {
 const blipADSR = (volume: number) => new ADSR(0.01, 0.2, 0.01, 0.05, volume);
 const thumpADSR = (volume: number) => new ADSR(0.01, 0.2, 0.01, 0.05, volume);
 const rattleADSR = (volume: number) => new ADSR(0.01, 0.2, 0.05, 0.01, volume);
-const lushADSR = (volume: number) => new ADSR(0.05, 0.2, .2, 0.4, volume);
+const lushADSR = (volume: number) => new ADSR(0.05, 0.3, .2, 0.2, volume);
 
 function singleOscSound(start: number, frequency: number, ctx: AudioContext, adsr: ADSR, osc_type: OscillatorType): Stoppable {
     const osc = ctx.createOscillator();
