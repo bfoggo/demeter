@@ -42,7 +42,7 @@
 </script>
 
 <div
-    class="w-2/3 grid grid-cols-8 auto-cols-max grid-flow-row-dense gap-1 mr-4"
+    class="w-2/3 grid grid-cols-8 auto-cols-max grid-flow-row-dense divide-black divide-x-4 divide-dotted mr-4"
 >
     {#each Array.from({ length: musicSettings.complexityPattern.length * musicSettings.measures }, (_, i) => i) as measure}
     {pushNewDefaultChordIfNeeded()}
@@ -52,7 +52,7 @@
         <div class="col-span-1 h-9">
             <input
                 type="text"
-                class="w-full text-center h-full border-none shadow-sm focus:ring-0 text-sm bg-{measure == selectedMeasure ? 'gray-200' : 'white'}"
+                class="w-full text-center h-full border-none shadow-md focus:ring-0 text-sm bg-{measure == selectedMeasure ? 'gray-100' : 'white'}"
                 value={asString(allChords[measure])}
                 onfocus={(e) => {
                     const target = e.target as HTMLInputElement;

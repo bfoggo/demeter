@@ -24,10 +24,7 @@
         {#each ["C", "D", "E", "F", "G", "A", "B"] as note}
             <div>
                 <button
-                    class="w-9 border-2 border-gray-200 text-center hover:bg-gray-200"
-                    style="background: {note === builtChord.root.name
-                        ? 'gray'
-                        : 'white'}"
+                    class="w-9 border-2 border-gray-300 text-center hover:bg-gray-300 bg-{note === builtChord.root.name ? 'gray-200' : 'white'}"
                     onclick={() => {
                         setRoot(note as NoteNameSharp);
                     }}>{note}</button
