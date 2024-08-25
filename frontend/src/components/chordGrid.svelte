@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { ChordGrammar } from "../types/note";
+    import { parseChord, type ChordGrammar } from "../types/note";
     import ChordBuild from "./chordBuild.svelte";
     import ChordGrid from "./chordGrid.svelte";
     import { Settings } from "./musicsettings.svelte";
@@ -13,6 +13,12 @@
         builtChord: ChordGrammar;
         parsedChord: ChordGrammar;
     } = $props();
+
+    function parseChordInput(input: string) {
+        parsedChord = parseChord(input, "sharps");
+    }
+
+    $inspect(parsedChord);
 </script>
 
 <div
@@ -24,6 +30,12 @@
                 type="text"
                 class="w-full text-center h-full text-sm"
                 value={""}
+                onchange={(e) => {
+                    const target = e.target as HTMLInputElement;
+                    if (target){
+                        parseChordInput(target.value);
+                    }}
+                }
             />
         </div>
     {/each}
